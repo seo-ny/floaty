@@ -1,0 +1,22 @@
+# Ignore node_modules everywhere
+node_modules/
+
+# Build output
+dist/
+build/
+.output/
+
+# Env files
+.env
+.env.*
+
+# Logs
+*.log
+
+# IDE config
+.vscode/
+.idea/
+
+# Nuxt/Vite
+.nuxt/
+.next/
