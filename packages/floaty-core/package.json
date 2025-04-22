@@ -1,0 +1,26 @@
+{
+  "name": "@seo-ny/floaty-core",
+  "version": "1.0.0",
+  "description": "Floating logic core for positioning elements (vanilla JS)",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "vite build"
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "seo-ny",
+  "license": "MIT",
+  "keywords": [
+    "floaty",
+    "floaty-core",
+    "floating",
+    "floating-elements",
+    "core",
+    "vanilla-js"
+  ],
+  "devDependencies": {
+    "vite": "^6.3.2"
+  }
+}
