@@ -23,6 +23,12 @@ importers:
         specifier: ^6.3.2
         version: 6.3.2
 
+  playground/vanilla:
+    devDependencies:
+      vite:
+        specifier: ^6.3.2
+        version: 6.3.2
+
 packages:
   "@esbuild/aix-ppc64@0.25.2":
     resolution:
