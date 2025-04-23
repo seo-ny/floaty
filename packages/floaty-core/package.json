@@ -2,10 +2,17 @@
   "name": "@seo-ny/floaty-core",
   "version": "1.0.0",
   "description": "Floating logic core for positioning elements (vanilla JS)",
-  "main": "dist/index.js",
+  "main": "./dist/floaty.umd.js",
+  "module": "./dist/floaty.es.js",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/floaty.es.js",
+      "require": "./dist/floaty.umd.js"
+    }
+  },
   "scripts": {
-    "build": "vite build"
+    "build": "vite build --watch"
   },
   "files": [
     "dist"
