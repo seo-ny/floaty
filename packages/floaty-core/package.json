@@ -26,8 +26,5 @@
     "floating-elements",
     "core",
     "vanilla-js"
-  ],
-  "devDependencies": {
-    "vite": "^6.3.2"
-  }
+  ]
 }
