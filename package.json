@@ -5,10 +5,17 @@
     "packages/*",
     "playground/*"
   ],
+  "scripts": {
+    "sb:vanilla": "pnpm --filter vanilla run storybook"
+  },
   "devDependencies": {
+    "@storybook/cli": "^8.0.0",
+    "@storybook/html-vite": "^8.0.0",
+    "@storybook/builder-vite": "^8.0.0-beta.9",
+    "@storybook/addon-essentials": "^8.0.0",
     "eslint": "^9.25.0",
     "eslint-config-prettier": "^10.1.2",
     "prettier": "^3.5.3",
-    "vite": "^6.3.2"
+    "vite": "^5.2.8"
   }
 }

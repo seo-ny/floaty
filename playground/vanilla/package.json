@@ -1,0 +1,10 @@
+{
+  "name": "vanilla",
+  "version": "1.0.0",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "storybook": "storybook dev -p 6006 --config-dir=.storybook"
+  },
+  "description": "A playground to test floaty-core in vanilla JS"
+}
