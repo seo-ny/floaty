@@ -1,15 +1,20 @@
+import path, { join, dirname } from "path";
 import { mergeConfig } from "vite";
-import path from "path";
 
-export default {
+function getAbsolutePath(value) {
+  return dirname(require.resolve(join(value, "package.json")));
+}
+
+const config = {
+  stories: ["../src/components/**/*.stories.@(js|mjs)"],
+  addons: [
+    getAbsolutePath("@storybook/addon-essentials"),
+    getAbsolutePath("@storybook/addon-interactions")
+  ],
   framework: {
-    name: "@storybook/html-vite"
+    name: getAbsolutePath("@storybook/html-vite"),
+    options: {}
   },
-  core: {
-    builder: "@storybook/builder-vite"
-  },
-  stories: ["../src/components/**/*.stories.js"],
-  addons: ["@storybook/addon-essentials"],
   async viteFinal(config) {
     return mergeConfig(config, {
       resolve: {
@@ -21,3 +26,4 @@ export default {
     });
   }
 };
+export default config;

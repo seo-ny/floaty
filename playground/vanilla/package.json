@@ -4,7 +4,17 @@
   "main": "main.js",
   "type": "module",
   "scripts": {
-    "storybook": "storybook dev -p 6006 --config-dir=.storybook"
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
-  "description": "A playground to test floaty-core in vanilla JS"
+  "description": "A playground to test floaty-core in vanilla JS",
+  "devDependencies": {
+    "@storybook/addon-essentials": "^8.6.12",
+    "@storybook/addon-interactions": "^8.6.12",
+    "@storybook/blocks": "^8.6.12",
+    "@storybook/html": "^8.6.12",
+    "@storybook/html-vite": "^8.6.12",
+    "@storybook/test": "^8.6.12",
+    "storybook": "^8.6.12"
+  }
 }
