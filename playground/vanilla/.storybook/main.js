@@ -20,7 +20,10 @@ const config = {
       resolve: {
         alias: {
           "@": path.resolve(__dirname, "../src"),
-          "floaty-core": "../../../packages/floaty-core/dist/floaty.es.js"
+          "floaty-core": path.resolve(
+            __dirname,
+            "../../../packages/floaty-core/dist/floaty.js"
+          )
         }
       }
     });
