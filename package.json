@@ -6,7 +6,8 @@
     "playground/*"
   ],
   "scripts": {
-    "sb:vanilla": "pnpm --filter vanilla storybook"
+    "sb:vanilla": "pnpm --filter vanilla storybook",
+    "build:vanilla": "pnpm --filter vanilla build-storybook"
   },
   "devDependencies": {
     "eslint": "^9.25.0",

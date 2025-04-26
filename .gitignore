@@ -21,4 +21,6 @@ build/
 .nuxt/
 .next/
 
+# Storybook
 *storybook.log
+storybook-static/
