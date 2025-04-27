@@ -3,6 +3,10 @@ export const parameters = {
     argTypesRegex: "^on[A-Z].*"
   },
   controls: {
-    expanded: true
+    expanded: false
+  },
+  options: {
+    showPanel: true,
+    panelPosition: "right"
   }
 };
