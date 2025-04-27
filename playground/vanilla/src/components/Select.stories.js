@@ -1,13 +1,81 @@
 import * as Floaty from "floaty-core";
 
 export default {
-  title: "Components/select"
+  title: "Components/Select",
+  args: {
+    placement: "bottom",
+    strategy: "absolute",
+    boundary: "clippingAncestors",
+    rootBoundary: "viewport",
+    padding: 0,
+    behaviors: [
+      { name: "offset", options: { value: 0 } },
+      { name: "shift", options: { padding: 0 } },
+      { name: "flip" }
+    ]
+  },
+  argTypes: {
+    placement: {
+      description:
+        "floatingEl을 referenceEl을 기준으로 어느 쪽에 배치하고 정렬시킬 것인가",
+      control: "select",
+      options: [
+        "bottom",
+        "bottoms-start",
+        "bottom-end",
+        "top",
+        "top-start",
+        "top-end",
+        "left",
+        "left-start",
+        "left-end",
+        "right",
+        "right-start",
+        "right-end"
+      ]
+    },
+    strategy: {
+      description: "floatingEl의 포지셔닝 방식",
+      control: "inline-radio",
+      options: ["absolute", "fixed"]
+    },
+    boundary: {
+      description:
+        "(개발자가 설정할) floatingEl이 넘치는지 판단할 기준이 되는 경계 (여길 넘으면 안돼!)",
+      control: "inline-radio",
+      options: ["clippingAncestors", "Element"]
+    },
+    rootBoundary: {
+      description:
+        "(boundary와 별도로) floatingEl이 무조건 넘칠 수밖에 없는 시스템적 경계 (여기 넘으면 안 보여!)",
+      control: "inline-radio",
+      options: ["viewport", "document"]
+    },
+    padding: {
+      description: "floatingEl이 넘치는지 판단하는 경계(교집합 영역)의 padding",
+      control: "inline-radio",
+      options: [0, 10, 30, 50, 100]
+    },
+    behaviors: {
+      description:
+        "floatingEl이 넘칠 경우 취할 동작들 정의 (순서 중요, 동작별 상세 옵션은 문서 참고)",
+      control: "object",
+      options: [
+        { name: "offset", options: { value: 0 } },
+        { name: "shift", options: { padding: 0 } },
+        { name: "flip" }
+      ]
+    }
+  }
 };
 
-export const Basic = () => {
-  const div = document.createElement("div");
+const Template = () => {
+  const selectWrapper = document.createElement("div");
+  selectWrapper.textContent = "select";
 
-  console.log(Floaty);
+  Floaty.computePosition();
 
-  return div;
+  return selectWrapper;
 };
+
+export const Basic = Template.bind({});
