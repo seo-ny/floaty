@@ -16,5 +16,8 @@
     "@storybook/html-vite": "^8.6.12",
     "@storybook/test": "^8.6.12",
     "storybook": "^8.6.12"
+  },
+  "dependencies": {
+    "normalize.css": "^8.0.1"
   }
 }

@@ -62,9 +62,15 @@ export default {
 
 const Template = () => {
   const selectWrapper = document.createElement("div");
-  selectWrapper.textContent = "select";
+  const selectTrigger = document.createElement("div");
+  const dropdownMenu = document.createElement("div");
 
-  Floaty.computePosition();
+  selectWrapper.appendChild(selectTrigger);
+  selectWrapper.appendChild(dropdownMenu);
+
+  document.body.appendChild(selectWrapper);
+
+  Floaty.computePosition(selectTrigger, dropdownMenu, {});
 
   return selectWrapper;
 };
