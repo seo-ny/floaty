@@ -8,11 +8,7 @@ export default {
     boundary: "clippingAncestors",
     rootBoundary: "viewport",
     padding: 0,
-    behaviors: [
-      { name: "offset", options: { value: 0 } },
-      { name: "shift", options: { padding: 0 } },
-      { name: "flip" }
-    ]
+    behaviors: []
   },
   argTypes: {
     placement: {
@@ -59,12 +55,7 @@ export default {
     behaviors: {
       description:
         "floatingEl이 넘칠 경우 취할 동작들 정의 (순서 중요, 동작별 상세 옵션은 문서 참고)",
-      control: "object",
-      options: [
-        { name: "offset", options: { value: 0 } },
-        { name: "shift", options: { padding: 0 } },
-        { name: "flip" }
-      ]
+      control: "object"
     }
   }
 };
