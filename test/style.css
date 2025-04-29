@@ -23,13 +23,14 @@
 .dropdown-menu {
   /* margin: 4px 0 0; */
   overflow: auto;
-  /* visibility: hidden;
+  visibility: hidden;
   opacity: 0;
-  pointer-events: none; */
+  pointer-events: none;
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
+  padding: 2px 0;
   border-radius: 4px;
   background-color: lightblue;
   z-index: 10;
@@ -50,9 +51,9 @@
 }
 
 .dropdown-menu.open {
-  /* visibility: visible;
+  visibility: visible;
   opacity: 1;
-  pointer-events: auto; */
+  pointer-events: auto;
 }
 
 .menu-list {
@@ -63,6 +64,14 @@
 
 .menu-item {
   padding: 8px 12px;
+  border-radius: 8px;
+  border-width: 2px 4px;
+  border-style: solid;
+  border-color: lightblue;
+}
+
+.menu-item.selected {
+  background-color: white;
 }
 
 .menu-item:hover {

@@ -13,13 +13,39 @@ function createSelectComponent({
 
   const dropdownMenu = document.createElement("div");
   dropdownMenu.className = "dropdown-menu";
-  dropdownMenu.style.display = "none";
 
   const menuList = document.createElement("ul");
   menuList.className = "menu-list";
 
   let isOpen = false;
   let selectedValue = null;
+  let selectedItem = null;
+
+  function onTriggerClick() {
+    toggleDropdown();
+    scrollIntoSelectedOption(selectedValue);
+  }
+
+  function toggleDropdown() {
+    isOpen = !isOpen;
+
+    if (isOpen) {
+      openDropdown(selectedItem);
+    } else {
+      closeDropdown();
+    }
+
+    dropdownMenu.style.maxHeight = getDropdownMaxHeight();
+  }
+
+  function openDropdown(selectedItem = null) {
+    dropdownMenu.classList.add("open");
+    updateSelectedItemStyles(selectedItem);
+  }
+
+  function closeDropdown() {
+    dropdownMenu.classList.remove("open");
+  }
 
   function getDropdownMaxHeight() {
     if (!isOpen) {
@@ -29,29 +55,44 @@ function createSelectComponent({
     const firstMenuItem = menuList.children[0];
 
     if (firstMenuItem && maxVisibleItems < options.length) {
-      return `${maxVisibleItems * firstMenuItem.offsetHeight}px`;
+      return `${maxVisibleItems * firstMenuItem.getBoundingClientRect().height}px`;
     }
     return "none";
   }
 
-  function toggleDropdown() {
-    isOpen = !isOpen;
-    dropdownMenu.style.display = isOpen ? "block" : "none";
+  function updateSelectedItemStyles(selectedItem = null) {
+    Array.from(menuList.children).forEach((item) => {
+      item.classList.remove("selected");
+    });
+
+    if (selectedItem) {
+      selectedItem.classList.add("selected");
+    }
   }
 
-  function onTriggerClick() {
-    toggleDropdown();
-    dropdownMenu.style.maxHeight = getDropdownMaxHeight();
+  function scrollIntoSelectedOption(selectedValue = null) {
+    const selectedOptionIndex = options.findIndex(
+      ({ value }) => value === selectedValue
+    );
+
+    if (selectedOptionIndex !== -1) {
+      menuList.children[selectedOptionIndex].scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+      });
+    }
   }
 
-  function handleOptionClick(option) {
+  function handleOptionClick(option = {}, item = null) {
     selectedValue = option.value;
+    selectedItem = item;
     trigger.textContent = option.label;
 
+    updateSelectedItemStyles(selectedItem);
     toggleDropdown();
 
-    if (selectedValue != null) {
-      this.style.backgroundColor = "lightcyan";
+    if (selectedItem != null) {
+      selectedItem.classList.add("selected");
     }
 
     if (typeof onSelect === "function") {
@@ -64,7 +105,7 @@ function createSelectComponent({
     const item = document.createElement("li");
     item.className = "menu-item";
     item.textContent = option.label;
-    item.addEventListener("click", handleOptionClick.bind(item, option));
+    item.addEventListener("click", () => handleOptionClick(option, item));
 
     menuList.appendChild(item);
   });
