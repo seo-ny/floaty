@@ -1,7 +1,7 @@
-import * as Floaty from "floaty-core";
+import { Template } from "@/components/select/select.template.js";
 
 export default {
-  title: "Components/Select",
+  title: "components/select",
   args: {
     placement: "bottom",
     strategy: "absolute",
@@ -60,19 +60,38 @@ export default {
   }
 };
 
-const Template = () => {
-  const selectWrapper = document.createElement("div");
-  const selectTrigger = document.createElement("div");
-  const dropdownMenu = document.createElement("div");
-
-  selectWrapper.appendChild(selectTrigger);
-  selectWrapper.appendChild(dropdownMenu);
-
-  document.body.appendChild(selectWrapper);
-
-  Floaty.computePosition(selectTrigger, dropdownMenu, {});
-
-  return selectWrapper;
-};
-
 export const Basic = Template.bind({});
+Basic.args = {
+  options: [
+    {
+      value: "red",
+      label: "빨간색"
+    },
+    {
+      value: "blue",
+      label: "파란색"
+    },
+    {
+      value: "green",
+      label: "초록색"
+    },
+    {
+      value: "yellow",
+      label: "노란색"
+    },
+    {
+      value: "purple",
+      label: "보라색"
+    },
+    {
+      value: "orange",
+      label: "주황색"
+    },
+    {
+      value: "pink",
+      label: "분홍색"
+    }
+  ],
+  placeholder: "선택하시오.",
+  maxVisibleItems: 6
+};
