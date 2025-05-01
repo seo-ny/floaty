@@ -122,7 +122,7 @@ function createSelectComponent({
   selectWrapper.appendChild(dropdownMenu);
 
   return {
-    select: selectWrapper,
+    selectEl: selectWrapper,
     referenceEl: trigger,
     floatingEl: dropdownMenu
   };
@@ -207,9 +207,17 @@ function createSelectStyles() {
   return style;
 }
 
-export const Template = (args = {}) => {
-  const { options, placeholder, onSelect, maxVisibleItems } = args;
-  const { select, referenceEl, floatingEl } = createSelectComponent({
+export const Template = (args = { select: {} }) => {
+  const {
+    select: { options, placeholder, onSelect, maxVisibleItems } = {},
+    placement,
+    strategy,
+    boundary,
+    rootBoundary,
+    padding,
+    behaviors
+  } = args;
+  const { selectEl, referenceEl, floatingEl } = createSelectComponent({
     options,
     placeholder,
     onSelect,
@@ -217,7 +225,16 @@ export const Template = (args = {}) => {
   });
 
   // floaty 적용
-  Floaty.computePosition(referenceEl, floatingEl);
+  requestAnimationFrame(() => {
+    Floaty.computePosition(referenceEl, floatingEl, {
+      placement,
+      strategy,
+      boundary,
+      rootBoundary,
+      padding,
+      behaviors
+    });
+  });
 
-  return select;
+  return selectEl;
 };

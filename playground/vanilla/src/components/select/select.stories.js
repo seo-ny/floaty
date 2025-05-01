@@ -65,7 +65,9 @@ const colorList = await getColorList();
 
 export const Basic = Template.bind({});
 Basic.args = {
-  options: colorList,
-  placeholder: "선택하시오.",
-  maxVisibleItems: 6
+  select: {
+    options: colorList,
+    placeholder: "선택하시오.",
+    maxVisibleItems: 6
+  }
 };
