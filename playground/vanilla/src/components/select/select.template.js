@@ -23,6 +23,7 @@ function createSelectComponent({
   menuList.className = "menu-list";
 
   let isOpen = false;
+  let onOpenCallback = null;
   let selectedValue = null;
   let selectedItem = null;
 
@@ -46,6 +47,10 @@ function createSelectComponent({
   function openDropdown(selectedItem = null) {
     dropdownMenu.classList.add("open");
     updateSelectedItemStyles(selectedItem);
+
+    if (typeof onOpenCallback === "function") {
+      onOpenCallback();
+    }
   }
 
   function closeDropdown() {
@@ -124,7 +129,10 @@ function createSelectComponent({
   return {
     selectEl: selectWrapper,
     referenceEl: trigger,
-    floatingEl: dropdownMenu
+    floatingEl: dropdownMenu,
+    setOnOpenCallback: (fn) => {
+      onOpenCallback = fn;
+    }
   };
 }
 
@@ -217,15 +225,15 @@ export const Template = (args = { select: {} }) => {
     padding,
     behaviors
   } = args;
-  const { selectEl, referenceEl, floatingEl } = createSelectComponent({
-    options,
-    placeholder,
-    onSelect,
-    maxVisibleItems
-  });
+  const { selectEl, referenceEl, floatingEl, setOnOpenCallback } =
+    createSelectComponent({
+      options,
+      placeholder,
+      onSelect,
+      maxVisibleItems
+    });
 
-  // floaty 적용
-  requestAnimationFrame(() => {
+  setOnOpenCallback(() => {
     Floaty.computePosition(referenceEl, floatingEl, {
       placement,
       strategy,
