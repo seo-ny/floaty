@@ -1,5 +1,5 @@
 import { DEFAULT_OPTIONS } from "@/constants/index.js";
-import { rectUtils, validateUtils } from "@/utils/index.js";
+import { placementUtils, rectUtils, validateUtils } from "@/utils/index.js";
 
 export const computePosition = (
   referenceEl = null,
@@ -16,9 +16,15 @@ export const computePosition = (
   const referenceElRect = rectUtils.getElementRect(referenceEl);
   const floatingElRect = rectUtils.getElementRect(floatingEl);
 
+  const { direction, align } = placementUtils.decomposePlacement(
+    options.placement
+  );
+
   console.log("[computePosition]", {
     referenceElRect,
     floatingElRect,
-    options
+    options,
+    direction,
+    align
   });
 };
