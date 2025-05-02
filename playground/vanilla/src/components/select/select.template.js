@@ -165,9 +165,6 @@ function createSelectStyles() {
       opacity: 0;
       pointer-events: none;
       position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
       padding: 2px 0;
       border-radius: 4px;
       background-color: lightblue;
