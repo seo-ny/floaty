@@ -220,7 +220,8 @@ export const Template = (args = { select: {} }) => {
     boundary,
     rootBoundary,
     padding,
-    behaviors
+    behaviors,
+    applyStyle
   } = args;
   const { selectEl, referenceEl, floatingEl, setOnOpenCallback } =
     createSelectComponent({
@@ -231,13 +232,14 @@ export const Template = (args = { select: {} }) => {
     });
 
   setOnOpenCallback(() => {
-    Floaty.computePosition(referenceEl, floatingEl, {
+    Floaty.setupPosition(referenceEl, floatingEl, {
       placement,
       strategy,
       boundary,
       rootBoundary,
       padding,
-      behaviors
+      behaviors,
+      applyStyle
     });
   });
 

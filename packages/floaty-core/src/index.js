@@ -1,7 +1,7 @@
-import { computePosition } from "@/core/computePosition.js";
+import { setupPosition } from "@/core/setupPosition.js";
 
 export default {
-  computePosition
+  setupPosition
 };
 
-export { computePosition };
+export { setupPosition };

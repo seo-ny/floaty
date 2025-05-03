@@ -1,7 +1,7 @@
 import { DEFAULT_OPTIONS } from "@/constants/index.js";
 import { placementUtils, rectUtils, validateUtils } from "@/utils/index.js";
 
-export const computePosition = (
+export const computePosition = async (
   referenceEl = null,
   floatingEl = null,
   originOptions = {}
@@ -20,6 +20,9 @@ export const computePosition = (
     options.placement
   );
 
+  let x = 0;
+  let y = 0;
+
   console.log("[computePosition]", {
     referenceElRect,
     floatingElRect,
@@ -27,4 +30,9 @@ export const computePosition = (
     direction,
     align
   });
+
+  return {
+    x,
+    y
+  };
 };

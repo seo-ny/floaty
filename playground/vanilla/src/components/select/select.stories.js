@@ -9,7 +9,8 @@ export default {
     boundary: "clippingAncestors",
     rootBoundary: "viewport",
     padding: 0,
-    behaviors: []
+    behaviors: [],
+    applyStyle: true
   },
   argTypes: {
     placement: {
@@ -57,6 +58,11 @@ export default {
       description:
         "floatingEl이 넘칠 경우 취할 동작들 정의 (순서 중요, 동작별 상세 옵션은 문서 참고)",
       control: "object"
+    },
+    applyStyle: {
+      description:
+        "위치 계산 이후 스타일도 내부적으로 업데이트되도록 할 것인지, 스타일 업데이트는 개발자의 재량에 맡길 것인지 여부",
+      control: "boolean"
     }
   }
 };
@@ -69,5 +75,6 @@ Basic.args = {
     options: colorList,
     placeholder: "선택하시오.",
     maxVisibleItems: 6
-  }
+  },
+  applyStyle: true
 };
