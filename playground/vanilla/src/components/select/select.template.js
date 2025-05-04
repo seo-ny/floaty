@@ -37,31 +37,27 @@ function createSelectComponent({
 
     if (isOpen) {
       openDropdown(selectedItem);
+
+      if (typeof onOpenCallback === "function") {
+        onOpenCallback();
+      }
     } else {
       closeDropdown();
     }
-
-    dropdownMenu.style.maxHeight = getDropdownMaxHeight();
   }
 
   function openDropdown(selectedItem = null) {
     dropdownMenu.classList.add("open");
+    dropdownMenu.style.maxHeight = getDropdownMaxHeight();
     updateSelectedItemStyles(selectedItem);
-
-    if (typeof onOpenCallback === "function") {
-      onOpenCallback();
-    }
   }
 
   function closeDropdown() {
     dropdownMenu.classList.remove("open");
+    dropdownMenu.style.maxHeight = "none";
   }
 
   function getDropdownMaxHeight() {
-    if (!isOpen) {
-      return "none";
-    }
-
     const firstMenuItem = menuList.children[0];
 
     if (firstMenuItem && maxVisibleItems < options.length) {
@@ -145,7 +141,6 @@ function createSelectStyles() {
     }
     .select {
       display: inline-block;
-      position: relative;
       width: 140px;
     }
     .select-trigger {
