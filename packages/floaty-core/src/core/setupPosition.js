@@ -1,3 +1,4 @@
+import { DEFAULT_OPTIONS } from "@/constants/index.js";
 import { computePosition } from "@/core/computePosition.js";
 
 export const setupPosition = async (
@@ -5,22 +6,21 @@ export const setupPosition = async (
   floatingEl = null,
   originOptions = {}
 ) => {
-  const { x, y } = await computePosition(
-    referenceEl,
-    floatingEl,
-    originOptions
-  );
+  const options = { ...DEFAULT_OPTIONS, ...originOptions };
+  const { x, y } = await computePosition(referenceEl, floatingEl, options);
 
-  if (originOptions.applyStyle) {
+  console.log("[setupPosition]", { x, y });
+
+  if (options.applyStyle) {
     requestAnimationFrame(() => {
       Object.assign(floatingEl.style, {
-        transform: `translate3d(${x}px, ${y}px, 0)`
+        // transform: `translate3d(${x}px, ${y}px, 0)`,
+        position: options.strategy,
+        left: `${x}px`,
+        top: `${y}px`
       });
     });
   }
 
-  return {
-    x,
-    y
-  };
+  return { x, y };
 };

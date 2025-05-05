@@ -76,5 +76,7 @@ Basic.args = {
     placeholder: "선택하시오.",
     maxVisibleItems: 6
   },
+  placement: "right-end",
+  strategy: "absolute",
   applyStyle: true
 };

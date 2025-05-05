@@ -141,6 +141,7 @@ function createSelectStyles() {
     }
     .select {
       display: inline-block;
+      position: relative;
       width: 140px;
     }
     .select-trigger {
@@ -160,6 +161,7 @@ function createSelectStyles() {
       opacity: 0;
       pointer-events: none;
       position: absolute;
+      min-width: max-content; // placement: right일 때 너비 줄어드는 문제 방지 or size 미들웨어 사용 가능
       padding: 2px 0;
       border-radius: 4px;
       background-color: lightblue;
@@ -183,12 +185,12 @@ function createSelectStyles() {
       border-radius: 999px;
       background-color: white;
     }
-    .menu-list {
+    ul.menu-list {
       margin: 0;
       padding: 0;
       list-style: none;
     }
-    .menu-item {
+    li.menu-item {
       padding: 8px 12px;
       border-radius: 8px;
       border-width: 2px 4px;
@@ -196,10 +198,10 @@ function createSelectStyles() {
       border-color: lightblue;
       cursor: pointer;
     }
-    .menu-item.selected {
+    li.menu-item.selected {
       background-color: white;
     }
-    .menu-item:hover {
+    li.menu-item:hover {
       background-color: lightcyan;
     }
   `;

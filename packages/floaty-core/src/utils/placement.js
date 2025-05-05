@@ -1,9 +1,9 @@
 const decomposePlacement = (placement = "bottom") => {
-  const [direction = "bottom", align = "center"] = placement.split("-");
+  const [direction = "bottom", alignment = "center"] = placement.split("-");
 
   return {
     direction,
-    align
+    alignment
   };
 };
 

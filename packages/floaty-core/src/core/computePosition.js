@@ -1,10 +1,14 @@
-import { DEFAULT_OPTIONS } from "@/constants/index.js";
-import { placementUtils, rectUtils, validateUtils } from "@/utils/index.js";
+import {
+  axisUtils,
+  placementUtils,
+  coordsUtils,
+  validateUtils
+} from "@/utils/index.js";
 
 export const computePosition = async (
   referenceEl = null,
   floatingEl = null,
-  originOptions = {}
+  options = {}
 ) => {
   if (
     !validateUtils.isHTMLElement(referenceEl) ||
@@ -12,27 +16,42 @@ export const computePosition = async (
   )
     return;
 
-  const options = { ...DEFAULT_OPTIONS, ...originOptions };
-  const referenceElRect = rectUtils.getElementRect(referenceEl);
-  const floatingElRect = rectUtils.getElementRect(floatingEl);
-
-  const { direction, align } = placementUtils.decomposePlacement(
+  const { direction, alignment } = placementUtils.decomposePlacement(
     options.placement
   );
-
-  let x = 0;
-  let y = 0;
+  const { mainAxis, crossAxis } = axisUtils.getAxesFromDirection(direction);
 
   console.log("[computePosition]", {
-    referenceElRect,
-    floatingElRect,
-    options,
+    // options,
     direction,
-    align
+    alignment,
+    mainAxis,
+    crossAxis
   });
 
-  return {
-    x,
-    y
+  const initialCoords = coordsUtils.getInitialCoords({
+    direction,
+    alignment,
+    referenceEl,
+    floatingEl,
+    mainAxis,
+    crossAxis
+  });
+
+  const strategyToPositionMap = {
+    absolute: () =>
+      coordsUtils.adjustCoordsToOffsetParent(
+        initialCoords,
+        floatingEl.parentElement // TODO: 실제 offsetParent 구해서 전달할 것
+      ),
+    fixed: () => initialCoords
   };
+
+  if (!strategyToPositionMap[options.strategy]) {
+    console.warn("[adjustPositionByStrategy] strategy가 유효하지 않음", {
+      strategy: options.strategy
+    });
+  }
+
+  return strategyToPositionMap[options.strategy]?.();
 };
