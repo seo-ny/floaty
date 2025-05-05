@@ -1,7 +1,7 @@
 import {
   axisUtils,
-  placementUtils,
   coordsUtils,
+  placementUtils,
   validateUtils
 } from "@/utils/index.js";
 

@@ -23,26 +23,29 @@ function createSelectComponent({
   menuList.className = "menu-list";
 
   let isOpen = false;
-  let onOpenCallback = null;
+  let onOpen = null;
   let selectedValue = null;
   let selectedItem = null;
+  let cleanup = null;
 
   function onTriggerClick() {
     toggleDropdown();
     scrollIntoSelectedOption(selectedValue);
   }
 
-  function toggleDropdown() {
+  async function toggleDropdown() {
     isOpen = !isOpen;
 
     if (isOpen) {
       openDropdown(selectedItem);
 
-      if (typeof onOpenCallback === "function") {
-        onOpenCallback();
+      if (typeof onOpen === "function") {
+        const { clear } = await onOpen();
+        cleanup = clear;
       }
     } else {
       closeDropdown();
+      cleanup();
     }
   }
 
@@ -126,8 +129,8 @@ function createSelectComponent({
     selectEl: selectWrapper,
     referenceEl: trigger,
     floatingEl: dropdownMenu,
-    setOnOpenCallback: (fn) => {
-      onOpenCallback = fn;
+    setOnOpen: (fn) => {
+      onOpen = fn;
     }
   };
 }
@@ -141,7 +144,7 @@ function createSelectStyles() {
     }
     .select {
       display: inline-block;
-      position: relative;
+      position: relative; // 추가, 삭제 하면서 테스트
       width: 140px;
     }
     .select-trigger {
@@ -157,8 +160,7 @@ function createSelectStyles() {
     }
     .dropdown-menu {
       overflow: auto;
-      visibility: hidden;
-      opacity: 0;
+      display: none;
       pointer-events: none;
       position: absolute;
       min-width: max-content; // placement: right일 때 너비 줄어드는 문제 방지 or size 미들웨어 사용 가능
@@ -169,8 +171,7 @@ function createSelectStyles() {
       transition: opacity 300ms ease;
     }
     .dropdown-menu.open {
-      visibility: visible;
-      opacity: 1;
+      display: block;
       pointer-events: auto;
     }
     .dropdown-menu::-webkit-scrollbar {
@@ -218,9 +219,9 @@ export const Template = (args = { select: {} }) => {
     rootBoundary,
     padding,
     behaviors,
-    applyStyle
+    onAfterComputePosition
   } = args;
-  const { selectEl, referenceEl, floatingEl, setOnOpenCallback } =
+  const { selectEl, referenceEl, floatingEl, setOnOpen } =
     createSelectComponent({
       options,
       placeholder,
@@ -228,15 +229,15 @@ export const Template = (args = { select: {} }) => {
       maxVisibleItems
     });
 
-  setOnOpenCallback(() => {
-    Floaty.setupPosition(referenceEl, floatingEl, {
+  setOnOpen(() => {
+    return Floaty.setupPosition(referenceEl, floatingEl, {
       placement,
       strategy,
       boundary,
       rootBoundary,
       padding,
       behaviors,
-      applyStyle
+      onAfterComputePosition
     });
   });
 

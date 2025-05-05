@@ -67,11 +67,11 @@ const getInitialCoords = ({
   initialCoords[crossAxis] =
     baseCoords[crossAxis] + (alignmentOffsetMap[alignment] || 0);
 
-  console.log("[getInitialCoords]", {
-    referenceElRect,
-    floatingElRect,
-    initialCoords
-  });
+  // console.log("[getInitialCoords]", {
+  //   referenceElRect,
+  //   floatingElRect,
+  //   initialCoords
+  // });
 
   return initialCoords;
 };
@@ -82,10 +82,10 @@ const adjustCoordsToOffsetParent = (
 ) => {
   const offsetParentElRect = rectUtils.getElementRect(offsetParentEl);
 
-  console.log("[adjustCoordsToOffsetParent]", {
-    offsetParentEl,
-    offsetParentElRect
-  });
+  // console.log("[adjustCoordsToOffsetParent]", {
+  //   offsetParentEl,
+  //   offsetParentElRect
+  // });
 
   return {
     x: originCoords.x - offsetParentElRect.x,

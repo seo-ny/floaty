@@ -17,11 +17,18 @@ export const parameters = {
 export const decorators = [
   (StoryFn) => {
     const wrapper = document.createElement("div");
+    wrapper.style.overflow = "auto";
     wrapper.style.display = "flex";
     wrapper.style.justifyContent = "center";
     wrapper.style.alignItems = "center";
-    wrapper.style.width = "100%";
-    wrapper.style.height = "100vh";
+    wrapper.style.position = "absolute";
+    wrapper.style.top = "100px";
+    wrapper.style.left = "100px";
+    // wrapper.style.width = "100%";
+    // wrapper.style.height = "100vh";
+    wrapper.style.width = "400px";
+    wrapper.style.height = "300px";
+    wrapper.style.backgroundColor = "lightgray";
 
     const story = StoryFn();
     wrapper.appendChild(story);

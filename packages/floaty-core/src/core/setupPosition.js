@@ -1,4 +1,5 @@
 import { DEFAULT_OPTIONS } from "@/constants/index.js";
+import { elementUtils } from "@/utils/index.js";
 import { computePosition } from "@/core/computePosition.js";
 
 export const setupPosition = async (
@@ -6,21 +7,50 @@ export const setupPosition = async (
   floatingEl = null,
   originOptions = {}
 ) => {
-  const options = { ...DEFAULT_OPTIONS, ...originOptions };
-  const { x, y } = await computePosition(referenceEl, floatingEl, options);
+  const updatePosition = async (e) => {
+    const options = { ...DEFAULT_OPTIONS, ...originOptions };
+    const { x, y } = await computePosition(referenceEl, floatingEl, options);
 
-  console.log("[setupPosition]", { x, y });
+    console.log("[updatePosition]", { x, y, eventTarget: e?.target });
 
-  if (options.applyStyle) {
-    requestAnimationFrame(() => {
-      Object.assign(floatingEl.style, {
-        // transform: `translate3d(${x}px, ${y}px, 0)`,
-        position: options.strategy,
-        left: `${x}px`,
-        top: `${y}px`
+    if (typeof options.onAfterComputePosition === "function") {
+      const data = {
+        elements: { reference: referenceEl, floating: floatingEl },
+        position: { x, y }
+      };
+      options.onAfterComputePosition(data);
+    } else {
+      requestAnimationFrame(() => {
+        Object.assign(floatingEl.style, {
+          position: options.strategy,
+          left: `${x}px`,
+          top: `${y}px`
+        });
       });
-    });
-  }
+    }
 
-  return { x, y };
+    return { x, y };
+  };
+
+  const scrollParents = elementUtils.getScrollParents(referenceEl);
+  setupEventListener(scrollParents, updatePosition);
+
+  const { x, y } = await updatePosition();
+
+  return {
+    x,
+    y,
+    clear: clearEventListener
+  };
+};
+
+const setupEventListener = (scrollParents = [], listener = () => {}) => {
+  scrollParents.forEach((el) => {
+    el.addEventListener("scroll", listener, { passive: true });
+  });
+};
+const clearEventListener = (scrollParents = [], listener = () => {}) => {
+  scrollParents.forEach((el) => {
+    el.removeEventListener("scroll", listener, { passive: true });
+  });
 };

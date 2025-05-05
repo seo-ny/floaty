@@ -10,7 +10,7 @@ export default {
     rootBoundary: "viewport",
     padding: 0,
     behaviors: [],
-    applyStyle: true
+    onAfterComputePosition: () => {}
   },
   argTypes: {
     placement: {
@@ -59,10 +59,10 @@ export default {
         "floatingEl이 넘칠 경우 취할 동작들 정의 (순서 중요, 동작별 상세 옵션은 문서 참고)",
       control: "object"
     },
-    applyStyle: {
+    onAfterComputePosition: {
       description:
-        "위치 계산 이후 스타일도 내부적으로 업데이트되도록 할 것인지, 스타일 업데이트는 개발자의 재량에 맡길 것인지 여부",
-      control: "boolean"
+        "위치 계산 직후 실행될 사용자 정의 로직 (ex. 스타일 업데이트)",
+      control: "object"
     }
   }
 };
@@ -76,7 +76,15 @@ Basic.args = {
     placeholder: "선택하시오.",
     maxVisibleItems: 6
   },
-  placement: "right-end",
+  placement: "right-start",
   strategy: "absolute",
-  applyStyle: true
+  onAfterComputePosition: ({ elements, position }) => {
+    requestAnimationFrame(() => {
+      Object.assign(elements.floating.style, {
+        position: "absolute",
+        left: `${position.x}px`,
+        top: `${position.y}px`
+      });
+    });
+  }
 };
