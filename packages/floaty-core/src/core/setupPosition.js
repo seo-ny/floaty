@@ -48,9 +48,11 @@ const setupEventListener = (scrollParents = [], listener = () => {}) => {
   scrollParents.forEach((el) => {
     el.addEventListener("scroll", listener, { passive: true });
   });
+  window.addEventListener("resize", listener);
 };
 const clearEventListener = (scrollParents = [], listener = () => {}) => {
   scrollParents.forEach((el) => {
     el.removeEventListener("scroll", listener, { passive: true });
   });
+  window.removeEventListener("resize", listener);
 };
