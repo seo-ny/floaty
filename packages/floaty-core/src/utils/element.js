@@ -22,4 +22,22 @@ const getScrollParents = (el = null) => {
   return scrollParents.concat(document.body, document.documentElement, window);
 };
 
-export { getScrollParents };
+const getPositioningParent = (elementToPosition = null) => {
+  let positioningParent = document.documentElement;
+  let currentEl = elementToPosition?.parentElement;
+
+  while (validateUtils.isHTMLElement(currentEl)) {
+    const { position } = getComputedStyle(currentEl);
+
+    if (/^(relative|absolute|sticky|fixed)$/.test(position)) {
+      positioningParent = currentEl;
+      break;
+    }
+
+    currentEl = currentEl.parentElement;
+  }
+
+  return positioningParent;
+};
+
+export { getScrollParents, getPositioningParent };

@@ -40,10 +40,7 @@ export const computePosition = async (
 
   const strategyToPositionMap = {
     absolute: () =>
-      coordsUtils.adjustCoordsToOffsetParent(
-        initialCoords,
-        floatingEl.parentElement // TODO: 실제 offsetParent 구해서 전달할 것
-      ),
+      coordsUtils.convertViewportToLocalCoords(initialCoords, referenceEl),
     fixed: () => initialCoords
   };
 

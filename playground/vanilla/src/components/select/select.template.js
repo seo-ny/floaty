@@ -144,7 +144,6 @@ function createSelectStyles() {
     }
     .select {
       display: inline-block;
-      position: relative; // 추가, 삭제 하면서 테스트
       width: 140px;
     }
     .select-trigger {
