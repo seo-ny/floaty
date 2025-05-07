@@ -1,14 +1,17 @@
+import { DEFAULT_OPTIONS } from "@/constants/index.js";
 import {
   axisUtils,
   coordsUtils,
+  layoutUtils,
   placementUtils,
+  rectUtils,
   validateUtils
 } from "@/utils/index.js";
 
 export const computePosition = async (
   referenceEl = null,
   floatingEl = null,
-  options = {}
+  options = DEFAULT_OPTIONS
 ) => {
   if (
     !validateUtils.isHTMLElement(referenceEl) ||
@@ -21,15 +24,15 @@ export const computePosition = async (
   );
   const { mainAxis, crossAxis } = axisUtils.getAxesFromDirection(direction);
 
-  console.log("[computePosition]", {
-    // options,
-    direction,
-    alignment,
-    mainAxis,
-    crossAxis
-  });
+  // console.log("[computePosition]", {
+  //   // options,
+  //   direction,
+  //   alignment,
+  //   mainAxis,
+  //   crossAxis
+  // });
 
-  const initialCoords = coordsUtils.getInitialCoords({
+  const initialCoords = rectUtils.getInitialRect({
     direction,
     alignment,
     referenceEl,
@@ -37,6 +40,9 @@ export const computePosition = async (
     mainAxis,
     crossAxis
   });
+  const overflows = layoutUtils.detectOverflow(referenceEl, initialCoords);
+
+  console.log("[computePosition]", { overflows });
 
   const strategyToPositionMap = {
     absolute: () =>

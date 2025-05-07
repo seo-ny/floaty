@@ -74,7 +74,7 @@ const getDefaultArgsWithStrategy = (strategy = "absolute") => {
     select: {
       options: colorList,
       placeholder: "선택하시오.",
-      maxVisibleItems: 6
+      maxVisibleItems: 8
     },
     placement: "right-start",
     strategy,

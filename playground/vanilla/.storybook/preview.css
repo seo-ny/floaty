@@ -4,13 +4,15 @@ html {
 }
 
 body {
+  overflow-y: auto;
   width: 100%;
   height: 100vh;
 }
 
 .container {
-  width: 100%;
-  height: 100vh;
+  overflow: auto;
+  width: 70%;
+  height: 80vh;
   background-color: lightpink;
 }
 
@@ -21,8 +23,8 @@ body {
   left: 100px;
   width: 400px;
   height: 300px;
-  border: 10px solid black;
-  padding: 50px;
+  border: 50px solid black;
+  padding: 30px;
   background-color: lightgray;
 }
 

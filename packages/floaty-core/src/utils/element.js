@@ -1,4 +1,5 @@
-import { validateUtils } from "@/utils/index.js";
+import { DEFAULT_RECT } from "@/constants/index.js";
+import { rectUtils, validateUtils } from "@/utils/index.js";
 
 const getScrollParents = (el = null) => {
   const scrollParents = [];
@@ -22,6 +23,55 @@ const getScrollParents = (el = null) => {
   return scrollParents.concat(document.body, document.documentElement, window);
 };
 
+// 유효한 overflow 속성을 가진 조상 요소들
+const getOverflowAncestors = (el = null) => {
+  const overflowAncestors = [];
+  let currentEl = el?.parentElement;
+
+  while (validateUtils.isHTMLElement(currentEl, { warn: false })) {
+    const style = getComputedStyle(currentEl);
+    const overflowStyles = style.overflow + style.overflowX + style.overflowY;
+
+    if (/(auto|scroll|clip|hidden)/.test(overflowStyles)) {
+      overflowAncestors.push(currentEl);
+    }
+
+    currentEl = currentEl.parentElement;
+  }
+
+  // console.log("[getOverflowAncestors]", { overflowAncestors });
+
+  return overflowAncestors;
+};
+
+// 실제로 내부 콘텐츠가 잘리는 요소들을 구함 (x, y축 어느 한쪽에서만 잘려도 포함됨)
+const getClippingAncestors = (
+  overflowAncestors = [],
+  floatingElRect = DEFAULT_RECT
+) => {
+  if (overflowAncestors.some((el) => !validateUtils.isHTMLElement(el))) return;
+
+  const isClipping = (overflowAncestorEl) => {
+    const overflowAncestorElRect = rectUtils.getInnerRect(overflowAncestorEl);
+
+    // console.log("[getClippingAncestors]", {
+    //   overflowAncestorElRect,
+    //   floatingElRect
+    // });
+
+    return (
+      floatingElRect.x < overflowAncestorElRect.x ||
+      floatingElRect.x + floatingElRect.width >
+        overflowAncestorElRect.x + overflowAncestorElRect.width ||
+      floatingElRect.y < overflowAncestorElRect.y ||
+      floatingElRect.y + floatingElRect.height >
+        overflowAncestorElRect.y + overflowAncestorElRect.height
+    );
+  };
+
+  return overflowAncestors.filter(isClipping);
+};
+
 const getPositioningParent = (elementToPosition = null) => {
   let positioningParent = document.documentElement;
   let currentEl = elementToPosition?.parentElement;
@@ -40,4 +90,9 @@ const getPositioningParent = (elementToPosition = null) => {
   return positioningParent;
 };
 
-export { getScrollParents, getPositioningParent };
+export {
+  getScrollParents,
+  getOverflowAncestors,
+  getClippingAncestors,
+  getPositioningParent
+};
