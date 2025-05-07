@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "Floating logic core for positioning elements (vanilla JS)",
   "main": "./dist/floaty.umd.js",
-  "module": "./dist/floaty.es.js",
+  "module": "./dist/floaty.mjs",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/floaty.es.js",
+      "import": "./dist/floaty.mjs",
       "require": "./dist/floaty.umd.js"
     }
   },

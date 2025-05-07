@@ -5,7 +5,12 @@ export default defineConfig({
     lib: {
       entry: "src/index.js",
       name: "Floaty",
-      fileName: "floaty",
+      fileName: (format) => {
+        if (format === "es") return "floaty.mjs";
+        if (format === "cjs") return "floaty.cjs";
+        if (format === "umd") return "floaty.umd.js";
+        return `floaty.${format}.js`;
+      },
       formats: ["es", "cjs", "umd"]
     },
     rollupOptions: {
