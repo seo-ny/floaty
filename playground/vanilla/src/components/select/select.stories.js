@@ -5,12 +5,12 @@ export default {
   title: "components/select",
   args: {
     placement: "bottom",
-    strategy: "absolute",
+    // strategy: "absolute",
     boundary: "clippingAncestors",
     rootBoundary: "viewport",
     padding: 0,
     behaviors: [],
-    onAfterComputePosition: () => {}
+    onAfterComputePosition: null
   },
   argTypes: {
     placement: {
@@ -32,11 +32,11 @@ export default {
         "right-end"
       ]
     },
-    strategy: {
-      description: "floatingEl의 포지셔닝 방식",
-      control: "inline-radio",
-      options: ["absolute", "fixed"]
-    },
+    // strategy: {
+    //   description: "floatingEl의 포지셔닝 방식",
+    //   control: "inline-radio",
+    //   options: ["absolute", "fixed"]
+    // },
     boundary: {
       description:
         "(개발자가 설정할) floatingEl이 넘치는지 판단할 기준이 되는 경계 (여길 넘으면 안돼!)",
@@ -69,22 +69,29 @@ export default {
 
 const colorList = await getColorList();
 
-export const Basic = Template.bind({});
-Basic.args = {
-  select: {
-    options: colorList,
-    placeholder: "선택하시오.",
-    maxVisibleItems: 6
-  },
-  placement: "right-start",
-  strategy: "absolute",
-  onAfterComputePosition: ({ elements, position }) => {
-    requestAnimationFrame(() => {
-      Object.assign(elements.floating.style, {
-        position: "absolute",
-        left: `${position.x}px`,
-        top: `${position.y}px`
+const getDefaultArgsWithStrategy = (strategy = "absolute") => {
+  return {
+    select: {
+      options: colorList,
+      placeholder: "선택하시오.",
+      maxVisibleItems: 6
+    },
+    placement: "right-start",
+    strategy,
+    onAfterComputePosition: ({ elements, position }) => {
+      requestAnimationFrame(() => {
+        Object.assign(elements.floating.style, {
+          position: strategy,
+          left: `${position.x}px`,
+          top: `${position.y}px`
+        });
       });
-    });
-  }
+    }
+  };
 };
+
+export const Absolute = Template.bind({});
+Absolute.args = getDefaultArgsWithStrategy("absolute");
+
+export const Fixed = Template.bind({});
+Fixed.args = getDefaultArgsWithStrategy("fixed");
