@@ -32,7 +32,7 @@ export const computePosition = async (
   //   crossAxis
   // });
 
-  const initialCoords = rectUtils.getInitialRect({
+  const initialRect = rectUtils.getInitialRect({
     direction,
     alignment,
     referenceEl,
@@ -40,14 +40,14 @@ export const computePosition = async (
     mainAxis,
     crossAxis
   });
-  const overflows = layoutUtils.detectOverflow(referenceEl, initialCoords);
+  const overflows = layoutUtils.detectOverflow(referenceEl, initialRect);
 
   console.log("[computePosition]", { overflows });
 
   const strategyToPositionMap = {
     absolute: () =>
-      coordsUtils.convertViewportToLocalCoords(initialCoords, referenceEl),
-    fixed: () => initialCoords
+      coordsUtils.convertViewportToLocalCoords(initialRect, referenceEl),
+    fixed: () => initialRect
   };
 
   if (!strategyToPositionMap[options.strategy]) {
