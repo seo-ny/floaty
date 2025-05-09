@@ -3,6 +3,7 @@ import { getColorList } from "@/api.js";
 
 export default {
   title: "components/select",
+  render: Template,
   args: {
     placement: "bottom",
     // strategy: "absolute",
@@ -90,8 +91,10 @@ const getDefaultArgsWithStrategy = (strategy = "absolute") => {
   };
 };
 
-export const Absolute = Template.bind({});
-Absolute.args = getDefaultArgsWithStrategy("absolute");
+export const Absolute = {
+  args: getDefaultArgsWithStrategy("absolute")
+};
 
-export const Fixed = Template.bind({});
-Fixed.args = getDefaultArgsWithStrategy("fixed");
+export const Fixed = {
+  args: getDefaultArgsWithStrategy("fixed")
+};

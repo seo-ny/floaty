@@ -18,6 +18,7 @@
     "storybook": "^8.6.12"
   },
   "dependencies": {
-    "normalize.css": "^8.0.1"
+    "normalize.css": "^8.0.1",
+    "@seo-ny/floaty-core": "workspace:*"
   }
 }

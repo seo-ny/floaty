@@ -19,11 +19,7 @@ const config = {
     return mergeConfig(config, {
       resolve: {
         alias: {
-          "@": path.resolve(__dirname, "../src"),
-          "floaty-core": path.resolve(
-            __dirname,
-            "../../../packages/floaty-core/dist/floaty.mjs"
-          )
+          "@": path.resolve(__dirname, "../src")
         }
       }
     });

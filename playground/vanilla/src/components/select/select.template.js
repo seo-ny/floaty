@@ -1,4 +1,4 @@
-import * as Floaty from "floaty-core";
+import * as Floaty from "@seo-ny/floaty-core";
 
 function createSelectComponent({
   options = [],
