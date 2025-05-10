@@ -1,5 +1,5 @@
-import { ALIGNMENT, AXIS, DEFAULT_RECT } from "@/constants/index.js";
-import { validateUtils } from "@/utils/index.js";
+import { ALIGNMENT, AXIS, DEFAULT_RECT } from "../constants";
+import { validateUtils } from "../utils";
 
 /**
  * [ bottom ]

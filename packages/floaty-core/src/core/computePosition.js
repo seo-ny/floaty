@@ -1,4 +1,4 @@
-import { DEFAULT_OPTIONS } from "@/constants/index.js";
+import { DEFAULT_OPTIONS } from "../constants";
 import {
   axisUtils,
   coordsUtils,
@@ -6,7 +6,7 @@ import {
   placementUtils,
   rectUtils,
   validateUtils
-} from "@/utils/index.js";
+} from "../utils";
 
 export const computePosition = async (
   referenceEl = null,

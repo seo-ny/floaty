@@ -18,10 +18,5 @@ export default defineConfig({
         exports: "named"
       }
     }
-  },
-  resolve: {
-    alias: {
-      "@": "/src"
-    }
   }
 });

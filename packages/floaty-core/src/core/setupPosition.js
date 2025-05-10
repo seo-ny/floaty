@@ -1,6 +1,6 @@
-import { DEFAULT_OPTIONS } from "@/constants/index.js";
-import { elementUtils } from "@/utils/index.js";
-import { computePosition } from "@/core/computePosition.js";
+import { DEFAULT_OPTIONS } from "../constants";
+import { elementUtils } from "../utils";
+import { computePosition } from "./computePosition.js";
 
 export const setupPosition = async (
   referenceEl = null,

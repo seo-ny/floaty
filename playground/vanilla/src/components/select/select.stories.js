@@ -1,5 +1,5 @@
-import { Template } from "@/components/select/select.template.js";
-import { getColorList } from "@/api.js";
+import { Template } from "./select.template.js";
+import { getColorList } from "../../api.js";
 
 export default {
   title: "components/select",

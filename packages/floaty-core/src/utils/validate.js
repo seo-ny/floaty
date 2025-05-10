@@ -1,4 +1,4 @@
-import { POSITIVE_DIRECTIONS, VERTICAL_DIRECTIONS } from "@/constants/index.js";
+import { POSITIVE_DIRECTIONS, VERTICAL_DIRECTIONS } from "../constants";
 
 const isHTMLElement = (el = null, { warn = true } = {}) => {
   const isElement = el && el instanceof HTMLElement;

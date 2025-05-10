@@ -1,5 +1,5 @@
-import { DEFAULT_RECT, DIRECTION } from "@/constants/index.js";
-import { elementUtils, rectUtils, validateUtils } from "@/utils/index.js";
+import { DEFAULT_RECT, DIRECTION } from "../constants";
+import { elementUtils, rectUtils, validateUtils } from "../utils";
 
 const detectOverflow = (referenceEl = null, floatingElRect = DEFAULT_RECT) => {
   if (!validateUtils.isHTMLElement(referenceEl)) return;

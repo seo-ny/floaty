@@ -1,4 +1,4 @@
-import { setupPosition } from "@/core/setupPosition.js";
+import { setupPosition } from "./core/setupPosition.js";
 
 export default {
   setupPosition

@@ -1,4 +1,4 @@
-import { elementUtils, rectUtils } from "@/utils/index.js";
+import { elementUtils, rectUtils } from "../utils";
 
 const convertViewportToLocalCoords = (
   viewportCoords = { x: 0, y: 0 },

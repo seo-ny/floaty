@@ -1,4 +1,4 @@
-import { AXIS, VERTICAL_DIRECTIONS } from "@/constants/index.js";
+import { AXIS, VERTICAL_DIRECTIONS } from "../constants";
 
 const getAxesFromDirection = (direction = "bottom") => {
   const isVertical = VERTICAL_DIRECTIONS.includes(direction);

@@ -1,5 +1,5 @@
-import { DEFAULT_RECT } from "@/constants/index.js";
-import { rectUtils, validateUtils } from "@/utils/index.js";
+import { DEFAULT_RECT } from "../constants";
+import { rectUtils, validateUtils } from "../utils";
 
 const getScrollParents = (el = null) => {
   const scrollParents = [];
