@@ -12,7 +12,8 @@
     }
   },
   "scripts": {
-    "build": "vite build --watch"
+    "build": "vite build --watch",
+    "build-once": "vite build"
   },
   "files": [
     "dist"

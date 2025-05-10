@@ -6,10 +6,14 @@
     "playground/*"
   ],
   "scripts": {
-    "sb:vanilla": "pnpm --filter vanilla storybook",
-    "build:vanilla": "pnpm --filter vanilla build-storybook"
+    "build:floaty:watch": "pnpm --filter @seo-ny/floaty-core build",
+    "build:floaty:once": "pnpm --filter @seo-ny/floaty-core build-once",
+    "vanilla:sb": "pnpm --filter vanilla storybook",
+    "vanilla:sb:build": "pnpm --filter vanilla build-storybook",
+    "dev": "pnpm build:floaty:once && concurrently \"pnpm build:floaty:watch\" \"pnpm vanilla:sb\""
   },
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "eslint": "^9.25.0",
     "eslint-config-prettier": "^10.1.2",
     "prettier": "^3.5.3",
