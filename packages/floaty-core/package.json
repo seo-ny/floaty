@@ -13,7 +13,8 @@
   },
   "scripts": {
     "build": "vite build --watch",
-    "build-once": "vite build"
+    "build-once": "vite build",
+    "test": "vitest"
   },
   "files": [
     "dist"
@@ -27,5 +28,9 @@
     "floating-elements",
     "core",
     "vanilla-js"
-  ]
+  ],
+  "devDependencies": {
+    "jsdom": "^26.1.0",
+    "vitest": "^3.1.3"
+  }
 }
