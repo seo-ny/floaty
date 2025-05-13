@@ -13,7 +13,9 @@
   },
   "scripts": {
     "build": "vite build --watch",
-    "build-once": "vite build",
+    "build:once": "vite build",
+    "release:next": "node ../../scripts/release-next.js",
+    "release:prod": "node ../../scripts/release-prod.js",
     "test": "vitest"
   },
   "files": [

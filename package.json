@@ -1,19 +1,26 @@
 {
   "name": "floaty",
   "private": true,
+  "type": "module",
   "workspaces": [
     "packages/*",
     "playground/*"
   ],
   "scripts": {
-    "build:floaty:watch": "pnpm --filter @seo-ny/floaty-core build",
-    "build:floaty:once": "pnpm --filter @seo-ny/floaty-core build-once",
+    "floaty:build:watch": "pnpm --filter @seo-ny/floaty-core build",
+    "floaty:build:once": "pnpm --filter @seo-ny/floaty-core build:once",
     "vanilla:sb": "pnpm --filter vanilla storybook",
     "vanilla:sb:build": "pnpm --filter vanilla build-storybook",
-    "dev": "pnpm build:floaty:once && concurrently \"pnpm build:floaty:watch\" \"pnpm vanilla:sb\"",
-    "test": "pnpm --filter @seo-ny/floaty-core test"
+    "dev": "pnpm floaty:build:once && concurrently \"pnpm floaty:build:watch\" \"pnpm vanilla:sb\"",
+    "test": "pnpm --filter @seo-ny/floaty-core test",
+    "changeset": "changeset",
+    "release:next": "pnpm --filter @seo-ny/floaty-core release:next",
+    "release:prod": "pnpm --filter @seo-ny/floaty-core release:prod",
+    "ci:version": "changeset version",
+    "ci:publish": "changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.4",
     "concurrently": "^9.1.2",
     "eslint": "^9.25.0",
     "eslint-config-prettier": "^10.1.2",
