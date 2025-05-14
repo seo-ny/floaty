@@ -1,11 +1,6 @@
 import { DEFAULT_OPTIONS } from "../constants";
-import {
-  axisUtils,
-  layoutUtils,
-  placementUtils,
-  rectUtils,
-  validateUtils
-} from "../utils";
+import { computeWithBehaviors } from "../behaviors";
+import { layoutUtils, rectUtils, validateUtils } from "../utils";
 
 export const computePosition = async (
   referenceEl = null,
@@ -18,41 +13,38 @@ export const computePosition = async (
   )
     return;
 
-  const { direction, alignment } = placementUtils.decomposePlacement(
-    options.placement
-  );
-  const { mainAxis, crossAxis } = axisUtils.getAxesFromDirection(direction);
-
-  // console.log("[computePosition]", {
-  //   // options,
-  //   direction,
-  //   alignment,
-  //   mainAxis,
-  //   crossAxis
-  // });
-
+  const rects = {
+    reference: rectUtils.getElementRect(referenceEl),
+    floating: rectUtils.getElementRect(floatingEl)
+  };
   const initialRect = rectUtils.getInitialRect({
-    direction,
-    alignment,
-    referenceEl,
-    floatingEl,
-    mainAxis,
-    crossAxis
+    placement: options.placement,
+    rects
   });
+  const computedRect = computeWithBehaviors({
+    behaviors: options.behaviors,
+    initialRect,
+    rects,
+    placement: options.placement
+  });
+
   const overflows = layoutUtils.detectOverflow({
     referenceEl,
-    floatingElRect: initialRect,
+    floatingElRect: computedRect,
     boundary: options.boundary,
     rootBoundary: options.rootBoundary,
     padding: options.padding
   });
 
-  console.log("[computePosition]", { overflows });
+  console.log("[computePosition]", {
+    // overflows,
+    computedRect
+  });
 
   const strategyToPositionMap = {
     absolute: () =>
-      layoutUtils.convertViewportToLocalRect(initialRect, referenceEl),
-    fixed: () => initialRect
+      layoutUtils.convertViewportToLocalRect(computedRect, referenceEl),
+    fixed: () => computedRect
   };
 
   if (!strategyToPositionMap[options.strategy]) {

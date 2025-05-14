@@ -32,6 +32,10 @@ const isRect = (rect = null, { warn = true } = {}) => {
   return isRectObject;
 };
 
+const isRects = (rects = {}, { warn = true } = {}) => {
+  return Object.values(rects).every((rect) => isRect(rect, { warn }));
+};
+
 const isDirectionPositive = (direction = "bottom") => {
   return POSITIVE_DIRECTIONS.includes(direction);
 };
@@ -40,4 +44,10 @@ const isDirectionVertical = (direction = "bottom") => {
   return VERTICAL_DIRECTIONS.includes(direction);
 };
 
-export { isHTMLElement, isRect, isDirectionPositive, isDirectionVertical };
+export {
+  isHTMLElement,
+  isRect,
+  isRects,
+  isDirectionPositive,
+  isDirectionVertical
+};

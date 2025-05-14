@@ -50,7 +50,7 @@ export const getColorList = async (USE_API = true) => {
     }
 
     const colorList = await fetch(
-      `https://mocki.io/v1/443cf9d8-d7bf-4f98-a365-3ed96a608cd7`
+      `https://run.mocky.io/v3/75d3bb6e-c577-41ac-97f1-3fe72b1210e2`
     ).then((res) => res.json());
 
     return colorList || [];

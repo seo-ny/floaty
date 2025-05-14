@@ -10,7 +10,12 @@ export default {
     boundary: "clippingAncestors",
     rootBoundary: "viewport",
     padding: 0,
-    behaviors: [],
+    behaviors: [
+      {
+        name: "offset",
+        options: { mainAxis: 10, alignmentAxis: 50 }
+      }
+    ],
     onAfterComputePosition: null
   },
   argTypes: {

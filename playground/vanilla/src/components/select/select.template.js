@@ -1,4 +1,4 @@
-import Floaty, { rectUtils } from "@seo-ny/floaty-core";
+import { setupPosition, rectUtils } from "@seo-ny/floaty-core";
 
 function createSelectComponent({
   options = [],
@@ -236,7 +236,7 @@ export const Template = (args = { select: {} }) => {
         : rawBoundary;
 
     setOnOpen(() => {
-      return Floaty.setupPosition(referenceEl, floatingEl, {
+      return setupPosition(referenceEl, floatingEl, {
         placement,
         strategy,
         boundary,

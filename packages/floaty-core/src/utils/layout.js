@@ -18,12 +18,12 @@ const detectOverflow = ({
     padding
   });
 
-  console.log("[detectOverflow]", {
-    // overflowAncestors,
-    // clippingAncestors,
-    clippingRect
-    // floatingElRect
-  });
+  // console.log("[detectOverflow]", {
+  //   // overflowAncestors,
+  //   // clippingAncestors,
+  //   clippingRect
+  //   // floatingElRect
+  // });
 
   // 잘리면 양수, 안 잘리면 음수
   const overflows = {
@@ -67,10 +67,10 @@ const getClippingRect = ({
       ? rectUtils.getViewportRect()
       : rectUtils.getDocumentRect();
 
-  console.log("[getClippingRect]", {
-    clippingRects,
-    rootBoundaryRect
-  });
+  // console.log("[getClippingRect]", {
+  //   clippingRects,
+  //   rootBoundaryRect
+  // });
 
   /**
    * 왼쪽, 위쪽: 큰 값 선택

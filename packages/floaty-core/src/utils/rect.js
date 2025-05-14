@@ -1,5 +1,5 @@
 import { ALIGNMENT, AXIS, DEFAULT_RECT } from "../constants";
-import { validateUtils } from "../utils";
+import { axisUtils, placementUtils, validateUtils } from "../utils";
 
 /**
  * [ bottom ]
@@ -36,15 +36,15 @@ import { validateUtils } from "../utils";
  * - left, right: referenceElRect.y + (referenceElRect.height - floatingElRect.height)
  */
 const getInitialRect = ({
-  direction = "bottom",
-  alignment = "center",
-  referenceEl = null,
-  floatingEl = null,
-  mainAxis = "y",
-  crossAxis = "x"
+  placement = "bottom",
+  rects = { reference: DEFAULT_RECT, floating: DEFAULT_RECT }
 }) => {
-  const referenceElRect = getElementRect(referenceEl);
-  const floatingElRect = getElementRect(floatingEl);
+  if (!validateUtils.isRects(rects)) return;
+
+  const { direction, alignment } = placementUtils.decomposePlacement(placement);
+  const { mainAxis, crossAxis } = axisUtils.getAxesFromDirection(direction);
+  const { reference: referenceElRect, floating: floatingElRect } = rects;
+
   let initialRect = { x: 0, y: 0, width: 0, height: 0 };
   const baseCoords = { x: referenceElRect.x, y: referenceElRect.y };
   const mainAxisSize = mainAxis === AXIS.Y ? "height" : "width";
@@ -78,11 +78,11 @@ const getInitialRect = ({
     right: initialRect.x + floatingElRect.width
   };
 
-  // console.log("[getInitialRect]", {
-  //   // referenceElRect,
-  //   // floatingElRect,
-  //   initialRect
-  // });
+  console.log("[getInitialRect]", {
+    // referenceElRect,
+    // floatingElRect,
+    initialRect
+  });
 
   return initialRect;
 };
