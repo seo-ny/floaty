@@ -19,17 +19,18 @@ export const decorators = [
   (StoryFn) => {
     const container = document.createElement("div");
     container.classList.add("container");
-
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("wrapper");
-
-    const box = document.createElement("div");
-    box.classList.add("box");
+    container.innerHTML = `
+      <div class="wrapper">
+        <div class="box"></div>
+      </div>
+    `;
 
     const story = StoryFn();
-    box.appendChild(story);
-    wrapper.appendChild(box);
-    container.appendChild(wrapper);
+    container.querySelector(".box").appendChild(story);
+
+    const bottomBox = document.createElement("div");
+    bottomBox.classList.add("box", "bottom");
+    document.body.appendChild(bottomBox);
 
     return container;
   }

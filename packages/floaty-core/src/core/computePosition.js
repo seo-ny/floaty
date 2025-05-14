@@ -1,7 +1,6 @@
 import { DEFAULT_OPTIONS } from "../constants";
 import {
   axisUtils,
-  coordsUtils,
   layoutUtils,
   placementUtils,
   rectUtils,
@@ -40,13 +39,18 @@ export const computePosition = async (
     mainAxis,
     crossAxis
   });
-  const overflows = layoutUtils.detectOverflow(referenceEl, initialRect);
+  const overflows = layoutUtils.detectOverflow({
+    referenceEl,
+    floatingElRect: initialRect,
+    boundary: options.boundary,
+    rootBoundary: options.rootBoundary
+  });
 
   console.log("[computePosition]", { overflows });
 
   const strategyToPositionMap = {
     absolute: () =>
-      coordsUtils.convertViewportToLocalCoords(initialRect, referenceEl),
+      layoutUtils.convertViewportToLocalRect(initialRect, referenceEl),
     fixed: () => initialRect
   };
 

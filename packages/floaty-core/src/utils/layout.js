@@ -1,21 +1,26 @@
 import { DEFAULT_RECT, DIRECTION } from "../constants";
 import { elementUtils, rectUtils, validateUtils } from "../utils";
 
-const detectOverflow = (referenceEl = null, floatingElRect = DEFAULT_RECT) => {
+const detectOverflow = ({
+  referenceEl = null,
+  floatingElRect = DEFAULT_RECT,
+  boundary = "clippingAncestors",
+  rootBoundary = "viewport"
+}) => {
   if (!validateUtils.isHTMLElement(referenceEl)) return;
 
-  const overflowAncestors = elementUtils.getOverflowAncestors(referenceEl);
-  const clippingAncestors = elementUtils.getClippingAncestors(
-    overflowAncestors,
-    floatingElRect
-  );
-  const clippingRect = getClippingRect(clippingAncestors);
+  const clippingRect = getClippingRect({
+    referenceEl,
+    floatingElRect,
+    boundary,
+    rootBoundary
+  });
 
   console.log("[detectOverflow]", {
     // overflowAncestors,
     // clippingAncestors,
-    clippingRect,
-    floatingElRect
+    clippingRect
+    // floatingElRect
   });
 
   // 잘리면 양수, 안 잘리면 음수
@@ -36,15 +41,33 @@ const detectOverflow = (referenceEl = null, floatingElRect = DEFAULT_RECT) => {
 };
 
 // 실제로 내부 콘텐츠가 잘리는 영역을 구함
-const getClippingRect = (clippingAncestors = []) => {
-  if (!clippingAncestors.filter((el) => !validateUtils.isHTMLElement(el)))
-    return;
+const getClippingRect = ({
+  referenceEl = null,
+  floatingElRect = DEFAULT_RECT,
+  boundary = "clippingAncestors",
+  rootBoundary = "viewport"
+}) => {
+  if (!validateUtils.isHTMLElement(referenceEl)) return;
 
-  const clippingRects = clippingAncestors
-    .filter(validateUtils.isHTMLElement)
-    .map(rectUtils.getInnerRect);
+  const clippingRects =
+    boundary === "clippingAncestors"
+      ? elementUtils
+          .getClippingAncestors(
+            elementUtils.getOverflowAncestors(referenceEl),
+            floatingElRect
+          )
+          .filter(validateUtils.isHTMLElement)
+          .map(rectUtils.getElementInnerRect)
+      : [boundary].filter(validateUtils.isRect);
+  const rootBoundaryRect =
+    rootBoundary === "viewport"
+      ? rectUtils.getViewportRect()
+      : rectUtils.getDocumentRect();
 
-  // console.log("[getClippingRect]", { clippingRects });
+  console.log("[getClippingRect]", {
+    clippingRects,
+    rootBoundaryRect
+  });
 
   /**
    * 왼쪽, 위쪽: 큰 값 선택
@@ -62,11 +85,43 @@ const getClippingRect = (clippingAncestors = []) => {
       x,
       y,
       width,
-      height
+      height,
+      top: y,
+      bottom: y + height,
+      left: x,
+      right: x + width
     };
   };
 
-  return clippingRects.reduce(intersectRects);
+  return clippingRects.reduce(intersectRects, rootBoundaryRect);
 };
 
-export { detectOverflow, getClippingRect };
+const convertViewportToLocalRect = (
+  viewportRect = DEFAULT_RECT,
+  elementToPosition = null
+) => {
+  const positioningParent =
+    elementUtils.getPositioningParent(elementToPosition);
+  const positioningContextRect =
+    rectUtils.getElementContentRect(positioningParent);
+  const x = viewportRect.x - positioningContextRect.x;
+  const y = viewportRect.y - positioningContextRect.y;
+
+  // console.log("[convertViewportToLocalRect]", {
+  //   positioningParent,
+  //   positioningContextRect
+  // });
+
+  return {
+    x,
+    y,
+    width: viewportRect.width,
+    height: viewportRect.height,
+    top: y,
+    bottom: y + viewportRect.height,
+    left: x,
+    right: x + viewportRect.width
+  };
+};
+
+export { detectOverflow, getClippingRect, convertViewportToLocalRect };

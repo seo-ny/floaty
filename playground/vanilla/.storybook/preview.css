@@ -33,3 +33,7 @@ body {
   height: 1400px;
   background-color: firebrick;
 }
+
+.box.bottom {
+  background-color: slateblue;
+}

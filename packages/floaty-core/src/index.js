@@ -5,3 +5,4 @@ export default {
 };
 
 export { setupPosition };
+export * from "./utils/index.js";

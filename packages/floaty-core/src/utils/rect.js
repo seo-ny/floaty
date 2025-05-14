@@ -78,11 +78,11 @@ const getInitialRect = ({
     right: initialRect.x + floatingElRect.width
   };
 
-  console.log("[getInitialRect]", {
-    // referenceElRect,
-    // floatingElRect,
-    initialRect
-  });
+  // console.log("[getInitialRect]", {
+  //   // referenceElRect,
+  //   // floatingElRect,
+  //   initialRect
+  // });
 
   return initialRect;
 };
@@ -96,7 +96,7 @@ const getElementRect = (el = null) => {
 };
 
 // border 제외하고 padding, content만 포함하는 영역을 구함
-const getInnerRect = (el = null) => {
+const getElementInnerRect = (el = null) => {
   if (!validateUtils.isHTMLElement(el)) return;
 
   const rect = getElementRect(el);
@@ -116,4 +116,88 @@ const getInnerRect = (el = null) => {
   };
 };
 
-export { getInitialRect, getElementRect, getInnerRect };
+// border는 제외하고 스크롤 위치까지 고려하여 요소의 스크롤 가능한 내부 콘텐츠 영역을 구함
+const getElementContentRect = (el = null) => {
+  if (!validateUtils.isHTMLElement(el)) return;
+
+  const innerRect = getElementInnerRect(el);
+  const { scrollWidth, scrollHeight, scrollLeft, scrollTop } = el;
+  const x = innerRect.x - scrollLeft;
+  const y = innerRect.y - scrollTop;
+
+  return {
+    x,
+    y,
+    width: scrollWidth,
+    height: scrollHeight,
+    top: y,
+    bottom: y + scrollHeight,
+    left: x,
+    right: x + scrollWidth
+  };
+};
+
+// 스크롤 위치를 고려하지 않고 뷰포트 영역을 구함
+const getViewportRect = () => {
+  const width = VisualViewport?.width ?? window.innerWidth ?? 0;
+  const height = VisualViewport?.height ?? window.innerHeight ?? 0;
+  const x = VisualViewport?.offsetLeft ?? window.scrollX ?? 0;
+  const y = VisualViewport?.offsetTop ?? window.scrollY ?? 0;
+
+  return {
+    x,
+    y,
+    width,
+    height,
+    top: y,
+    bottom: y + height,
+    left: x,
+    right: x + width
+  };
+};
+
+// 스크롤 위치 고려하여 Document(문서 전체)의 스크롤 가능한 내부 컨텐츠 영역을 구함
+const getDocumentRect = () => {
+  const documentEl = document.documentElement;
+  const body = document.body;
+
+  const scrollLeft =
+    window.scrollX ?? documentEl.scrollLeft ?? body.scrollLeft ?? 0;
+  const scrollTop =
+    window.scrollY ?? documentEl.scrollTop ?? body.scrollTop ?? 0;
+
+  const width = Math.max(
+    body.scrollWidth,
+    body.offsetWidth,
+    documentEl.scrollWidth,
+    documentEl.clientWidth,
+    documentEl.offsetWidth
+  );
+  const height = Math.max(
+    body.scrollHeight,
+    body.offsetHeight,
+    documentEl.scrollHeight,
+    documentEl.clientHeight,
+    documentEl.offsetHeight
+  );
+
+  return {
+    x: 0 - scrollLeft,
+    y: 0 - scrollTop,
+    width,
+    height,
+    top: 0 - scrollTop,
+    bottom: 0 - scrollTop + height,
+    left: 0 - scrollLeft,
+    right: 0 - scrollLeft + width
+  };
+};
+
+export {
+  getInitialRect,
+  getElementRect,
+  getElementInnerRect,
+  getElementContentRect,
+  getViewportRect,
+  getDocumentRect
+};

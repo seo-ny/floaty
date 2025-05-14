@@ -11,12 +11,12 @@ export const setupPosition = async (
     const options = { ...DEFAULT_OPTIONS, ...originOptions };
     const { x, y } = await computePosition(referenceEl, floatingEl, options);
 
-    console.log("[updatePosition]", {
-      x,
-      y,
-      eventTarget: e?.target,
-      eventType: e?.type
-    });
+    // console.log("[updatePosition]", {
+    //   x,
+    //   y,
+    //   eventTarget: e?.target,
+    //   eventType: e?.type
+    // });
 
     if (typeof options.onAfterComputePosition === "function") {
       const data = {

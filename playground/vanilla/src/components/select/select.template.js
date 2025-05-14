@@ -1,4 +1,4 @@
-import * as Floaty from "@seo-ny/floaty-core";
+import Floaty, { rectUtils } from "@seo-ny/floaty-core";
 
 function createSelectComponent({
   options = [],
@@ -214,7 +214,7 @@ export const Template = (args = { select: {} }) => {
     select: { options, placeholder, onSelect, maxVisibleItems } = {},
     placement,
     strategy,
-    boundary,
+    boundary: rawBoundary,
     rootBoundary,
     padding,
     behaviors,
@@ -228,15 +228,23 @@ export const Template = (args = { select: {} }) => {
       maxVisibleItems
     });
 
-  setOnOpen(() => {
-    return Floaty.setupPosition(referenceEl, floatingEl, {
-      placement,
-      strategy,
-      boundary,
-      rootBoundary,
-      padding,
-      behaviors,
-      onAfterComputePosition
+  requestAnimationFrame(() => {
+    const wrapper = document.querySelector(".wrapper");
+    const boundary =
+      rawBoundary === "Rect"
+        ? rectUtils.getElementContentRect(wrapper)
+        : rawBoundary;
+
+    setOnOpen(() => {
+      return Floaty.setupPosition(referenceEl, floatingEl, {
+        placement,
+        strategy,
+        boundary,
+        rootBoundary,
+        padding,
+        behaviors,
+        onAfterComputePosition
+      });
     });
   });
 

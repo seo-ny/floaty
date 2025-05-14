@@ -42,7 +42,7 @@ export default {
       description:
         "(개발자가 설정할) floatingEl이 넘치는지 판단할 기준이 되는 경계 (여길 넘으면 안돼!)",
       control: "inline-radio",
-      options: ["clippingAncestors", "Element"]
+      options: ["clippingAncestors", "Rect"]
     },
     rootBoundary: {
       description:

@@ -51,21 +51,22 @@ const getClippingAncestors = (
 ) => {
   if (overflowAncestors.some((el) => !validateUtils.isHTMLElement(el))) return;
 
-  const isClipping = (overflowAncestorEl) => {
-    const overflowAncestorElRect = rectUtils.getInnerRect(overflowAncestorEl);
+  const isClipping = (overflowAncestorEl = null) => {
+    const overflowAncestorInnerRect =
+      rectUtils.getElementInnerRect(overflowAncestorEl);
 
     // console.log("[getClippingAncestors]", {
-    //   overflowAncestorElRect,
+    //   overflowAncestorInnerRect,
     //   floatingElRect
     // });
 
     return (
-      floatingElRect.x < overflowAncestorElRect.x ||
+      floatingElRect.x < overflowAncestorInnerRect.x ||
       floatingElRect.x + floatingElRect.width >
-        overflowAncestorElRect.x + overflowAncestorElRect.width ||
-      floatingElRect.y < overflowAncestorElRect.y ||
+        overflowAncestorInnerRect.x + overflowAncestorInnerRect.width ||
+      floatingElRect.y < overflowAncestorInnerRect.y ||
       floatingElRect.y + floatingElRect.height >
-        overflowAncestorElRect.y + overflowAncestorElRect.height
+        overflowAncestorInnerRect.y + overflowAncestorInnerRect.height
     );
   };
 

@@ -13,6 +13,25 @@ const isHTMLElement = (el = null, { warn = true } = {}) => {
   return isElement;
 };
 
+const isRect = (rect = null, { warn = true } = {}) => {
+  const isRectObject =
+    rect &&
+    typeof rect === "object" &&
+    "x" in rect &&
+    "y" in rect &&
+    "width" in rect &&
+    "height" in rect;
+
+  if (!isRectObject && warn) {
+    console.warn("[isRect] Rect가 아님", {
+      hasRect: !!rect,
+      isRect: isRectObject
+    });
+  }
+
+  return isRectObject;
+};
+
 const isDirectionPositive = (direction = "bottom") => {
   return POSITIVE_DIRECTIONS.includes(direction);
 };
@@ -21,4 +40,4 @@ const isDirectionVertical = (direction = "bottom") => {
   return VERTICAL_DIRECTIONS.includes(direction);
 };
 
-export { isHTMLElement, isDirectionPositive, isDirectionVertical };
+export { isHTMLElement, isRect, isDirectionPositive, isDirectionVertical };
