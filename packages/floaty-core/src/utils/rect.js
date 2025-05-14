@@ -117,7 +117,7 @@ const getElementInnerRect = (el = null) => {
 };
 
 // border는 제외하고 스크롤 위치까지 고려하여 요소의 스크롤 가능한 내부 콘텐츠 영역을 구함
-const getElementContentRect = (el = null) => {
+const getElementScrollContentRect = (el = null) => {
   if (!validateUtils.isHTMLElement(el)) return;
 
   const innerRect = getElementInnerRect(el);
@@ -134,6 +134,19 @@ const getElementContentRect = (el = null) => {
     bottom: y + scrollHeight,
     left: x,
     right: x + scrollWidth
+  };
+};
+
+const insetRect = (rect = DEFAULT_RECT, padding = 0) => {
+  return {
+    x: rect.x + padding,
+    y: rect.y + padding,
+    width: rect.width - padding * 2,
+    height: rect.height - padding * 2,
+    top: rect.y + padding,
+    bottom: rect.y + rect.height - padding,
+    left: rect.x + padding,
+    right: rect.x + rect.width - padding
   };
 };
 
@@ -197,7 +210,8 @@ export {
   getInitialRect,
   getElementRect,
   getElementInnerRect,
-  getElementContentRect,
+  getElementScrollContentRect,
+  insetRect,
   getViewportRect,
   getDocumentRect
 };

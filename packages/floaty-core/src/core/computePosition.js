@@ -43,7 +43,8 @@ export const computePosition = async (
     referenceEl,
     floatingElRect: initialRect,
     boundary: options.boundary,
-    rootBoundary: options.rootBoundary
+    rootBoundary: options.rootBoundary,
+    padding: options.padding
   });
 
   console.log("[computePosition]", { overflows });

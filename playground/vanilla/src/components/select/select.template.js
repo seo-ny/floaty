@@ -232,7 +232,7 @@ export const Template = (args = { select: {} }) => {
     const wrapper = document.querySelector(".wrapper");
     const boundary =
       rawBoundary === "Rect"
-        ? rectUtils.getElementContentRect(wrapper)
+        ? rectUtils.getElementScrollContentRect(wrapper)
         : rawBoundary;
 
     setOnOpen(() => {

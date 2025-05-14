@@ -5,7 +5,8 @@ const detectOverflow = ({
   referenceEl = null,
   floatingElRect = DEFAULT_RECT,
   boundary = "clippingAncestors",
-  rootBoundary = "viewport"
+  rootBoundary = "viewport",
+  padding = 0
 }) => {
   if (!validateUtils.isHTMLElement(referenceEl)) return;
 
@@ -13,7 +14,8 @@ const detectOverflow = ({
     referenceEl,
     floatingElRect,
     boundary,
-    rootBoundary
+    rootBoundary,
+    padding
   });
 
   console.log("[detectOverflow]", {
@@ -45,7 +47,8 @@ const getClippingRect = ({
   referenceEl = null,
   floatingElRect = DEFAULT_RECT,
   boundary = "clippingAncestors",
-  rootBoundary = "viewport"
+  rootBoundary = "viewport",
+  padding = 0
 }) => {
   if (!validateUtils.isHTMLElement(referenceEl)) return;
 
@@ -93,7 +96,15 @@ const getClippingRect = ({
     };
   };
 
-  return clippingRects.reduce(intersectRects, rootBoundaryRect);
+  const intersectionRect = clippingRects.reduce(
+    intersectRects,
+    rootBoundaryRect
+  );
+  const clippingRect = padding
+    ? rectUtils.insetRect(intersectionRect, padding)
+    : intersectionRect;
+
+  return clippingRect;
 };
 
 const convertViewportToLocalRect = (
@@ -103,7 +114,7 @@ const convertViewportToLocalRect = (
   const positioningParent =
     elementUtils.getPositioningParent(elementToPosition);
   const positioningContextRect =
-    rectUtils.getElementContentRect(positioningParent);
+    rectUtils.getElementScrollContentRect(positioningParent);
   const x = viewportRect.x - positioningContextRect.x;
   const y = viewportRect.y - positioningContextRect.y;
 
