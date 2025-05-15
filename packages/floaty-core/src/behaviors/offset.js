@@ -44,10 +44,6 @@ export const offset = ({
     x: computedCoords.x,
     y: computedCoords.y,
     width: rects.floating.width,
-    height: rects.floating.height,
-    top: computedCoords.y,
-    bottom: computedCoords.y + rects.floating.height,
-    left: computedCoords.x,
-    right: computedCoords.x + rects.floating.width
+    height: rects.floating.height
   };
 };

@@ -71,11 +71,7 @@ const getInitialRect = ({
   initialRect = {
     ...initialRect,
     [mainAxisSize]: floatingElRect[mainAxisSize],
-    [crossAxisSize]: floatingElRect[crossAxisSize],
-    top: initialRect.y,
-    left: initialRect.x,
-    bottom: initialRect.y + floatingElRect.height,
-    right: initialRect.x + floatingElRect.width
+    [crossAxisSize]: floatingElRect[crossAxisSize]
   };
 
   console.log("[getInitialRect]", {
@@ -108,11 +104,7 @@ const getElementInnerRect = (el = null) => {
     x,
     y,
     width: clientWidth,
-    height: clientHeight,
-    top: y,
-    bottom: y + clientHeight,
-    left: x,
-    right: x + clientWidth
+    height: clientHeight
   };
 };
 
@@ -129,11 +121,7 @@ const getElementScrollContentRect = (el = null) => {
     x,
     y,
     width: scrollWidth,
-    height: scrollHeight,
-    top: y,
-    bottom: y + scrollHeight,
-    left: x,
-    right: x + scrollWidth
+    height: scrollHeight
   };
 };
 
@@ -142,11 +130,7 @@ const insetRect = (rect = DEFAULT_RECT, padding = 0) => {
     x: rect.x + padding,
     y: rect.y + padding,
     width: rect.width - padding * 2,
-    height: rect.height - padding * 2,
-    top: rect.y + padding,
-    bottom: rect.y + rect.height - padding,
-    left: rect.x + padding,
-    right: rect.x + rect.width - padding
+    height: rect.height - padding * 2
   };
 };
 
@@ -161,11 +145,7 @@ const getViewportRect = () => {
     x,
     y,
     width,
-    height,
-    top: y,
-    bottom: y + height,
-    left: x,
-    right: x + width
+    height
   };
 };
 
@@ -198,11 +178,7 @@ const getDocumentRect = () => {
     x: 0 - scrollLeft,
     y: 0 - scrollTop,
     width,
-    height,
-    top: 0 - scrollTop,
-    bottom: 0 - scrollTop + height,
-    left: 0 - scrollLeft,
-    right: 0 - scrollLeft + width
+    height
   };
 };
 

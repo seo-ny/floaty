@@ -88,11 +88,7 @@ const getClippingRect = ({
       x,
       y,
       width,
-      height,
-      top: y,
-      bottom: y + height,
-      left: x,
-      right: x + width
+      height
     };
   };
 
@@ -127,11 +123,7 @@ const convertViewportToLocalRect = (
     x,
     y,
     width: viewportRect.width,
-    height: viewportRect.height,
-    top: y,
-    bottom: y + viewportRect.height,
-    left: x,
-    right: x + viewportRect.width
+    height: viewportRect.height
   };
 };
 
