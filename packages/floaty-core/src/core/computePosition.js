@@ -1,5 +1,5 @@
-import { DEFAULT_OPTIONS } from "../constants";
 import { computeWithBehaviors } from "../behaviors";
+import { DEFAULT_OPTIONS } from "../constants";
 import { layoutUtils, rectUtils, validateUtils } from "../utils";
 
 export const computePosition = async (
