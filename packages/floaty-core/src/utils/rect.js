@@ -152,10 +152,10 @@ const insetRect = (rect = DEFAULT_RECT, padding = 0) => {
 
 // 스크롤 위치를 고려하지 않고 뷰포트 영역을 구함
 const getViewportRect = () => {
-  const width = VisualViewport?.width ?? window.innerWidth ?? 0;
-  const height = VisualViewport?.height ?? window.innerHeight ?? 0;
-  const x = VisualViewport?.offsetLeft ?? window.scrollX ?? 0;
-  const y = VisualViewport?.offsetTop ?? window.scrollY ?? 0;
+  const width = window.visualViewport?.width ?? window.innerWidth ?? 0;
+  const height = window.visualViewport?.height ?? window.innerHeight ?? 0;
+  const x = window.visualViewport?.offsetLeft ?? window.scrollX ?? 0;
+  const y = window.visualViewport?.offsetTop ?? window.scrollY ?? 0;
 
   return {
     x,
