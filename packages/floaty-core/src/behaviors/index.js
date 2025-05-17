@@ -11,7 +11,7 @@ const isValidBehavior = ({ name }) => {
   const isValid = typeof behaviorFn === "function";
 
   if (!isValid) {
-    console.warn("[computePosition] behaviorFn이 함수가 아님", {
+    console.error("[computePosition] behaviorFn이 함수가 아님", {
       name,
       behaviorFn
     });

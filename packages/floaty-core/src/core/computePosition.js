@@ -48,7 +48,7 @@ export const computePosition = async (
   };
 
   if (!strategyToPositionMap[options.strategy]) {
-    console.warn("[adjustPositionByStrategy] strategy가 유효하지 않음", {
+    console.error("[adjustPositionByStrategy] strategy가 유효하지 않음", {
       strategy: options.strategy
     });
   }
