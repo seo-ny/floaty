@@ -22,6 +22,11 @@ export default defineConfig({
   test: {
     include: ["__tests__/**/*.test.js"],
     environment: "jsdom",
-    setupFiles: ["./__tests__/setup.js"]
+    setupFiles: ["./__tests__/setup.js"],
+    coverage: {
+      include: ["src/**/*.js"],
+      reporter: ["text", "json", "html"],
+      reportsDirectory: "./__tests__/coverage"
+    }
   }
 });

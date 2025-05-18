@@ -13,6 +13,7 @@
     "vanilla:sb:build": "pnpm --filter vanilla build-storybook",
     "dev": "pnpm floaty:build:once && concurrently \"pnpm floaty:build:watch\" \"pnpm vanilla:sb\"",
     "test": "pnpm --filter @seo-ny/floaty-core test",
+    "test:coverage": "pnpm --filter @seo-ny/floaty-core test:coverage",
     "changeset": "changeset",
     "release:next": "pnpm --filter @seo-ny/floaty-core release:next",
     "release:prod": "pnpm --filter @seo-ny/floaty-core release:prod",

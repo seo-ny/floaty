@@ -27,3 +27,6 @@ build/
 # Storybook
 *storybook.log
 storybook-static/
+
+# Coverage
+coverage/

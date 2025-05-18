@@ -7,6 +7,8 @@ export const setupPosition = async (
   floatingEl = null,
   originOptions = {}
 ) => {
+  const scrollParents = elementUtils.getScrollParents(referenceEl);
+
   const updatePosition = async (e) => {
     const options = { ...DEFAULT_OPTIONS, ...originOptions };
     const { x, y } = await computePosition(referenceEl, floatingEl, options);
@@ -36,28 +38,25 @@ export const setupPosition = async (
 
     return { x, y };
   };
-
-  const scrollParents = elementUtils.getScrollParents(referenceEl);
-  setupEventListener(scrollParents, updatePosition);
+  const setupEventListener = () => {
+    scrollParents.forEach((el) => {
+      el.addEventListener("scroll", updatePosition, { passive: true });
+    });
+    window.addEventListener("resize", updatePosition);
+  };
+  const clearEventListener = () => {
+    scrollParents.forEach((el) => {
+      el.removeEventListener("scroll", updatePosition, { passive: true });
+    });
+    window.removeEventListener("resize", updatePosition);
+  };
 
   const { x, y } = await updatePosition();
+  setupEventListener();
 
   return {
     x,
     y,
     clear: clearEventListener
   };
-};
-
-const setupEventListener = (scrollParents = [], listener = () => {}) => {
-  scrollParents.forEach((el) => {
-    el.addEventListener("scroll", listener, { passive: true });
-  });
-  window.addEventListener("resize", listener);
-};
-const clearEventListener = (scrollParents = [], listener = () => {}) => {
-  scrollParents.forEach((el) => {
-    el.removeEventListener("scroll", listener, { passive: true });
-  });
-  window.removeEventListener("resize", listener);
 };

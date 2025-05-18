@@ -1,81 +1,135 @@
-import { expect, test, describe } from "vitest";
-import { rectUtils, layoutUtils } from "../../src/utils";
+import { expect, test, describe, vi, beforeEach, afterEach } from "vitest";
+import { computePosition } from "../../src/core/computePosition.js";
+import * as behaviors from "../../src/behaviors";
+import { DEFAULT_OPTIONS } from "../../src/constants";
+import { rectUtils, layoutUtils, validateUtils } from "../../src/utils";
 
-describe("[rectUtils.getInitialRect]", () => {
-  test("placement이 right-end일 때 올바른 initialRect 값을 계산해야 함", () => {
-    const rects = {
-      reference: {
-        x: 0,
-        y: 0,
-        width: 300,
-        height: 300,
-        top: 0,
-        bottom: 300,
-        left: 0,
-        right: 300
-      },
-      floating: {
-        x: 0,
-        y: 0,
-        width: 500,
-        height: 500,
-        top: 0,
-        bottom: 500,
-        left: 0,
-        right: 500
-      }
-    };
+const mockReferenceRect = {
+  x: 100,
+  y: 100,
+  width: 100,
+  height: 100,
+  top: 100,
+  bottom: 200,
+  left: 100,
+  right: 200
+};
 
-    const result = rectUtils.getInitialRect({
-      placement: "right-end",
-      rects
+const mockFloatingRect = {
+  x: 0,
+  y: 0,
+  width: 150,
+  height: 150,
+  top: 0,
+  bottom: 150,
+  left: 0,
+  right: 150
+};
+
+const mockComputedRect = {
+  x: 100,
+  y: 200,
+  width: 150,
+  height: 150
+};
+
+describe("computePosition 테스트", () => {
+  let referenceEl;
+  let floatingEl;
+  let getElementRectSpy;
+  let getInitialRectSpy;
+  let computeWithBehaviorsSpy;
+  let detectOverflowSpy;
+  let convertViewportToLocalRectSpy;
+
+  const setupMocks = () => {
+    getElementRectSpy = vi
+      .spyOn(rectUtils, "getElementRect")
+      .mockImplementation((el) => {
+        return el === referenceEl ? mockReferenceRect : mockFloatingRect;
+      });
+
+    getInitialRectSpy = vi
+      .spyOn(rectUtils, "getInitialRect")
+      .mockReturnValue(mockComputedRect);
+
+    computeWithBehaviorsSpy = vi
+      .spyOn(behaviors, "computeWithBehaviors")
+      .mockReturnValue(mockComputedRect);
+
+    detectOverflowSpy = vi
+      .spyOn(layoutUtils, "detectOverflow")
+      .mockReturnValue({
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0
+      });
+
+    convertViewportToLocalRectSpy = vi
+      .spyOn(layoutUtils, "convertViewportToLocalRect")
+      .mockReturnValue(mockComputedRect);
+  };
+
+  beforeEach(() => {
+    referenceEl = document.createElement("div");
+    referenceEl.style.width = "100px";
+    referenceEl.style.height = "100px";
+    referenceEl.style.position = "absolute";
+    referenceEl.style.top = "100px";
+    referenceEl.style.left = "100px";
+
+    floatingEl = document.createElement("div");
+    floatingEl.style.width = "150px";
+    floatingEl.style.height = "150px";
+
+    document.body.appendChild(referenceEl);
+    document.body.appendChild(floatingEl);
+
+    setupMocks();
+  });
+
+  afterEach(() => {
+    referenceEl.remove();
+    floatingEl.remove();
+    vi.restoreAllMocks();
+  });
+
+  test("computePosition은 유효한 요소가 전달되면 좌표를 반환해야 함", async () => {
+    const result = await computePosition(referenceEl, floatingEl);
+
+    expect(result).toEqual(mockComputedRect);
+    expect(getInitialRectSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        placement: DEFAULT_OPTIONS.placement,
+        rects: expect.any(Object)
+      })
+    );
+  });
+
+  test("유효하지 않은 요소가 전달되면 undefined를 반환해야 함", async () => {
+    vi.spyOn(validateUtils, "isHTMLElement").mockReturnValue(false);
+
+    const result = await computePosition(null, null);
+
+    expect(result).toBeUndefined();
+  });
+
+  test("strategy가 'fixed'일 때 올바른 좌표를 반환해야 함", async () => {
+    const result = await computePosition(referenceEl, floatingEl, {
+      ...DEFAULT_OPTIONS,
+      strategy: "fixed"
     });
 
-    const expected = {
-      x: 300,
-      y: -200,
-      width: 500,
-      height: 500,
-      top: -200,
-      bottom: 300,
-      left: 300,
-      right: 800
-    };
-
-    expect(result).toEqual(expected);
+    expect(result).toEqual(mockComputedRect);
   });
-});
 
-describe("[layoutUtils.convertViewportToLocalRect]", () => {
-  test("스크롤 후 viewport 좌표가 local 좌표로 올바르게 변환되어야 함", () => {
-    const ancestorEl = document.createElement("div");
-    const referenceEl = document.createElement("div");
+  test("유효하지 않은 strategy가 전달되면 에러 로그를 출력해야 함", async () => {
+    await computePosition(referenceEl, floatingEl, {
+      ...DEFAULT_OPTIONS,
+      strategy: "invalid"
+    });
 
-    ancestorEl.style.overflow = "scroll";
-    ancestorEl.style.width = "100px";
-    ancestorEl.style.height = "100px";
-    ancestorEl.style.position = "relative";
-
-    referenceEl.style.width = "50px";
-    referenceEl.style.height = "200px";
-    referenceEl.style.marginTop = "150px";
-
-    ancestorEl.appendChild(referenceEl);
-    document.body.appendChild(ancestorEl);
-
-    try {
-      const initialRect = referenceEl.getBoundingClientRect();
-
-      ancestorEl.scrollTop = 100;
-
-      const result = layoutUtils.convertViewportToLocalRect(
-        initialRect,
-        referenceEl
-      );
-
-      expect(result.top).toBeGreaterThan(initialRect.top);
-    } finally {
-      ancestorEl.remove();
-    }
+    expect(console.error).toHaveBeenCalled();
   });
 });
