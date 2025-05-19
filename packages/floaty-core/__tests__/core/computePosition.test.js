@@ -2,7 +2,7 @@ import { expect, test, describe, vi, beforeEach, afterEach } from "vitest";
 import { computePosition } from "../../src/core/computePosition.js";
 import * as behaviors from "../../src/behaviors";
 import { DEFAULT_OPTIONS } from "../../src/constants";
-import { rectUtils, layoutUtils, validateUtils } from "../../src/utils";
+import { rectUtils, layoutUtils } from "../../src/utils";
 
 const mockReferenceRect = {
   x: 100,
@@ -14,7 +14,6 @@ const mockReferenceRect = {
   left: 100,
   right: 200
 };
-
 const mockFloatingRect = {
   x: 0,
   y: 0,
@@ -25,7 +24,6 @@ const mockFloatingRect = {
   left: 0,
   right: 150
 };
-
 const mockComputedRect = {
   x: 100,
   y: 200,
@@ -107,12 +105,10 @@ describe("computePosition 테스트", () => {
     );
   });
 
-  test("유효하지 않은 요소가 전달되면 undefined를 반환해야 함", async () => {
-    vi.spyOn(validateUtils, "isHTMLElement").mockReturnValue(false);
-
-    const result = await computePosition(null, null);
-
-    expect(result).toBeUndefined();
+  test("유효하지 않은 요소가 전달되면 에러를 throw 해야 함", async () => {
+    await expect(async () => {
+      await computePosition(null, null);
+    }).rejects.toThrow();
   });
 
   test("strategy가 'fixed'일 때 올바른 좌표를 반환해야 함", async () => {
@@ -125,11 +121,11 @@ describe("computePosition 테스트", () => {
   });
 
   test("유효하지 않은 strategy가 전달되면 에러 로그를 출력해야 함", async () => {
-    await computePosition(referenceEl, floatingEl, {
-      ...DEFAULT_OPTIONS,
-      strategy: "invalid"
-    });
-
-    expect(console.error).toHaveBeenCalled();
+    await expect(async () => {
+      await computePosition(referenceEl, floatingEl, {
+        ...DEFAULT_OPTIONS,
+        strategy: "invalid"
+      });
+    }).rejects.toThrow();
   });
 });

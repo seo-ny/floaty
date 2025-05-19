@@ -10,33 +10,41 @@ export const setupPosition = async (
   const scrollParents = elementUtils.getScrollParents(referenceEl);
 
   const updatePosition = async (e) => {
-    const options = { ...DEFAULT_OPTIONS, ...originOptions };
-    const { x, y } = await computePosition(referenceEl, floatingEl, options);
+    try {
+      const options = { ...DEFAULT_OPTIONS, ...originOptions };
+      const { x, y } = await computePosition(referenceEl, floatingEl, options);
 
-    // console.log("[updatePosition]", {
-    //   x,
-    //   y,
-    //   eventTarget: e?.target,
-    //   eventType: e?.type
-    // });
+      // console.log("[updatePosition]", {
+      //   x,
+      //   y,
+      //   eventTarget: e?.target,
+      //   eventType: e?.type
+      // });
 
-    if (typeof options.onAfterComputePosition === "function") {
-      const data = {
-        elements: { reference: referenceEl, floating: floatingEl },
-        position: { x, y }
-      };
-      options.onAfterComputePosition(data);
-    } else {
-      requestAnimationFrame(() => {
-        Object.assign(floatingEl.style, {
-          position: options.strategy,
-          left: `${x}px`,
-          top: `${y}px`
+      if (typeof options.onAfterComputePosition === "function") {
+        const data = {
+          elements: { reference: referenceEl, floating: floatingEl },
+          position: { x, y }
+        };
+        options.onAfterComputePosition(data);
+      } else {
+        requestAnimationFrame(() => {
+          Object.assign(floatingEl.style, {
+            position: options.strategy,
+            left: `${x}px`,
+            top: `${y}px`
+          });
         });
-      });
-    }
+      }
 
-    return { x, y };
+      return { x, y };
+    } catch (err) {
+      console.error(err);
+      return {
+        x: 0,
+        y: 0
+      };
+    }
   };
   const setupEventListener = () => {
     scrollParents.forEach((el) => {

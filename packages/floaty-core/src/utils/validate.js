@@ -1,43 +1,27 @@
 import { POSITIVE_DIRECTIONS, VERTICAL_DIRECTIONS } from "../constants";
 
-const isHTMLElement = (el = null, { error = true } = {}) => {
-  const isElement = el && el instanceof HTMLElement;
-
-  if (!isElement && error) {
-    console.error("[isHTMLElement] HTML Element가 아님", {
-      hasElement: !!el,
-      isHTMLElement: el instanceof HTMLElement
-    });
-  }
-
-  return isElement;
+const isHTMLElement = (el = null) => {
+  return el && el instanceof HTMLElement;
 };
 
-const isRect = (rect = null, { error = true } = {}) => {
-  const isRectObject =
+const isRect = (rect = null) => {
+  return (
     rect &&
     typeof rect === "object" &&
     "x" in rect &&
     "y" in rect &&
     "width" in rect &&
-    "height" in rect;
-
-  if (!isRectObject && error) {
-    console.error("[isRect] Rect가 아님", {
-      hasRect: !!rect,
-      isRect: isRectObject
-    });
-  }
-
-  return isRectObject;
+    "height" in rect
+  );
 };
 
-const isRects = (rects = {}, { error = true } = {}) => {
-  if (!rects || typeof rects !== "object") {
-    console.error("[isRects] rects is not a valid object");
-  }
+const isRects = (rects = {}) => {
+  const isPlainObject =
+    typeof rects === "object" && rects !== null && !Array.isArray(rects);
 
-  return Object.values(rects).every((rect) => isRect(rect, { error }));
+  if (!isPlainObject) return false;
+
+  return Object.values(rects).every((rect) => isRect(rect));
 };
 
 const isDirectionPositive = (direction = "bottom") => {

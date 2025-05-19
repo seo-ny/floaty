@@ -1,5 +1,5 @@
 import { ALIGNMENT, DEFAULT_RECT } from "../constants";
-import { placementUtils, validateUtils } from "../utils";
+import { errorUtils, placementUtils, validateUtils } from "../utils";
 
 export const offset = ({
   options = {
@@ -15,7 +15,11 @@ export const offset = ({
   },
   placement = "bottom"
 }) => {
-  if (!validateUtils.isRects(rects)) return;
+  if (!validateUtils.isRects(rects)) {
+    errorUtils.throwError("[offset] rects가 유효하지 않음", {
+      rects
+    });
+  }
 
   const { mainAxis = 0, crossAxis = 0, alignmentAxis = 0 } = options;
   const { START, END } = ALIGNMENT;

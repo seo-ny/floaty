@@ -1,6 +1,6 @@
 import { computeWithBehaviors } from "../behaviors";
 import { DEFAULT_OPTIONS } from "../constants";
-import { layoutUtils, rectUtils, validateUtils } from "../utils";
+import { errorUtils, layoutUtils, rectUtils, validateUtils } from "../utils";
 
 export const computePosition = async (
   referenceEl = null,
@@ -10,8 +10,15 @@ export const computePosition = async (
   if (
     !validateUtils.isHTMLElement(referenceEl) ||
     !validateUtils.isHTMLElement(floatingEl)
-  )
-    return;
+  ) {
+    errorUtils.throwError(
+      "[computePosition] referenceEl 또는 floatingEl이 HTMLElement가 아님",
+      {
+        referenceEl,
+        floatingEl
+      }
+    );
+  }
 
   const rects = {
     reference: rectUtils.getElementRect(referenceEl),
@@ -48,9 +55,12 @@ export const computePosition = async (
   };
 
   if (!strategyToPositionMap[options.strategy]) {
-    console.error("[adjustPositionByStrategy] strategy가 유효하지 않음", {
-      strategy: options.strategy
-    });
+    errorUtils.throwError(
+      "[adjustPositionByStrategy] strategy가 유효하지 않음",
+      {
+        strategy: options.strategy
+      }
+    );
   }
 
   return strategyToPositionMap[options.strategy]?.();

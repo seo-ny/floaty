@@ -1,5 +1,5 @@
 import { DEFAULT_RECT, DIRECTION } from "../constants";
-import { elementUtils, rectUtils, validateUtils } from "../utils";
+import { elementUtils, errorUtils, rectUtils, validateUtils } from "../utils";
 
 const detectOverflow = ({
   referenceEl = null,
@@ -8,7 +8,11 @@ const detectOverflow = ({
   rootBoundary = "viewport",
   padding = 0
 }) => {
-  if (!validateUtils.isHTMLElement(referenceEl)) return;
+  if (!validateUtils.isHTMLElement(referenceEl)) {
+    errorUtils.throwError("[detectOverflow] referenceEl이 HTMLElement가 아님", {
+      referenceEl
+    });
+  }
 
   const clippingRect = getClippingRect({
     referenceEl,
@@ -50,7 +54,14 @@ const getClippingRect = ({
   rootBoundary = "viewport",
   padding = 0
 }) => {
-  if (!validateUtils.isHTMLElement(referenceEl)) return;
+  if (!validateUtils.isHTMLElement(referenceEl)) {
+    errorUtils.throwError(
+      "[getClippingRect] referenceEl이 HTMLElement가 아님",
+      {
+        referenceEl
+      }
+    );
+  }
 
   const clippingRects =
     boundary === "clippingAncestors"

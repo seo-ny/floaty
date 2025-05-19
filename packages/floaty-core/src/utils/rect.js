@@ -1,5 +1,5 @@
 import { ALIGNMENT, AXIS, DEFAULT_RECT } from "../constants";
-import { axisUtils, placementUtils, validateUtils } from "../utils";
+import { axisUtils, errorUtils, placementUtils, validateUtils } from "../utils";
 
 /**
  * [ bottom ]
@@ -39,7 +39,11 @@ const getInitialRect = ({
   placement = "bottom",
   rects = { reference: DEFAULT_RECT, floating: DEFAULT_RECT }
 }) => {
-  if (!validateUtils.isRects(rects)) return;
+  if (!validateUtils.isRects(rects)) {
+    errorUtils.throwError("[getInitialRect] rects가 유효하지 않음", {
+      rects
+    });
+  }
 
   const { direction, alignment } = placementUtils.decomposePlacement(placement);
   const { mainAxis, crossAxis } = axisUtils.getAxesFromDirection(direction);
@@ -84,7 +88,11 @@ const getInitialRect = ({
 };
 
 const getElementRect = (el = null) => {
-  if (!validateUtils.isHTMLElement(el)) return;
+  if (!validateUtils.isHTMLElement(el)) {
+    errorUtils.throwError("[getElementRect] el이 HTMLElement가 아님", {
+      el
+    });
+  }
 
   const rect = el.getBoundingClientRect();
 
@@ -93,7 +101,11 @@ const getElementRect = (el = null) => {
 
 // border 제외하고 padding, content만 포함하는 영역을 구함
 const getElementInnerRect = (el = null) => {
-  if (!validateUtils.isHTMLElement(el)) return;
+  if (!validateUtils.isHTMLElement(el)) {
+    errorUtils.throwError("[getElementInnerRect] el이 HTMLElement가 아님", {
+      el
+    });
+  }
 
   const rect = getElementRect(el);
   const { clientLeft, clientTop, clientWidth, clientHeight } = el;
@@ -110,7 +122,14 @@ const getElementInnerRect = (el = null) => {
 
 // border는 제외하고 스크롤 위치까지 고려하여 요소의 스크롤 가능한 내부 콘텐츠 영역을 구함
 const getElementScrollContentRect = (el = null) => {
-  if (!validateUtils.isHTMLElement(el)) return;
+  if (!validateUtils.isHTMLElement(el)) {
+    errorUtils.throwError(
+      "[getElementScrollContentRect] el이 HTMLElement가 아님",
+      {
+        el
+      }
+    );
+  }
 
   const innerRect = getElementInnerRect(el);
   const { scrollWidth, scrollHeight, scrollLeft, scrollTop } = el;

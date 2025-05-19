@@ -1,5 +1,5 @@
 import { DEFAULT_RECT } from "../constants";
-import { rectUtils, validateUtils } from "../utils";
+import { errorUtils, rectUtils, validateUtils } from "../utils";
 
 const getScrollParents = (el = null) => {
   const scrollParents = [];
@@ -28,7 +28,7 @@ const getOverflowAncestors = (el = null) => {
   const overflowAncestors = [];
   let currentEl = el?.parentElement;
 
-  while (validateUtils.isHTMLElement(currentEl, { warn: false })) {
+  while (validateUtils.isHTMLElement(currentEl)) {
     const style = getComputedStyle(currentEl);
     const overflowStyles = style.overflow + style.overflowX + style.overflowY;
 
@@ -49,7 +49,15 @@ const getClippingAncestors = (
   overflowAncestors = [],
   floatingElRect = DEFAULT_RECT
 ) => {
-  if (overflowAncestors.some((el) => !validateUtils.isHTMLElement(el))) return;
+  if (!overflowAncestors.length) return [];
+  if (overflowAncestors.some((el) => !validateUtils.isHTMLElement(el))) {
+    errorUtils.throwError(
+      "[getClippingAncestors] overflowAncestors에 유효하지 않은 요소가 포함되어 있음",
+      {
+        overflowAncestors
+      }
+    );
+  }
 
   const isClipping = (overflowAncestorEl = null) => {
     const overflowAncestorInnerRect =
