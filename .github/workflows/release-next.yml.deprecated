@@ -1,9 +1,9 @@
-name: Release
+name: Release (Next)
 
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-next.[0-9]+"
 
 jobs:
   release:
@@ -39,7 +39,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20"
           registry-url: "https://registry.npmjs.org/"
 
       - name: Install dependencies
@@ -71,10 +71,10 @@ jobs:
                 NOTES=$(tail -n +$((START_LINE + 1)) "$CORE_CHANGELOG")
               fi
             else
-              NOTES="Production release - version ${VERSION}"
+              NOTES="Next release (prerelease) - version ${VERSION}"
             fi
           else
-            NOTES="Production release - version ${VERSION}"
+            NOTES="Next release (prerelease) - version ${VERSION}"
           fi
 
           # GitHub Actions 출력 변수에 저장 (멀티라인 처리)
@@ -96,10 +96,10 @@ jobs:
               tag_name: tag,
               name: tag,
               body: `${{ steps.get_release_notes.outputs.NOTES }}`,
-              prerelease: false
+              prerelease: true
             });
 
-      - name: Publish floaty-core to npm
+      - name: Publish floaty-core to npm with "next" tag
         run: pnpm ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
