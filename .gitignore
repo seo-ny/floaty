@@ -30,3 +30,7 @@ storybook-static/
 
 # Coverage
 coverage/
+
+# website
+website/docs/
+website/playground/

@@ -1,0 +1,122 @@
+name: CI (release:next - Dev Merge)
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+    branches:
+      - dev
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 레포지토리 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. PR 라벨 확인
+      - name: Check PR labels
+        run: |
+          # PR 라벨 목록 가져오기
+          LABELS=$(echo '${{ toJSON(github.event.pull_request.labels.*.name) }}' | jq -r '.[]')
+
+          # 유효한 라벨 목록
+          VALID_LABELS=("release:next:patch" "release:next:minor" "release:next:major")
+
+          # 유효한 라벨 필터링
+          MATCHED_LABELS=()
+          for label in $LABELS; do
+            for valid_label in "${VALID_LABELS[@]}"; do
+              if [ "$label" = "$valid_label" ]; then
+                MATCHED_LABELS+=("$label")
+              fi
+            done
+          done
+
+          MATCHED_COUNT=${#MATCHED_LABELS[@]}
+
+          if [ "$MATCHED_COUNT" -ne 1 ]; then
+            echo "::error::Exactly one valid release label must be present. Found $MATCHED_COUNT. Expected one of: ${VALID_LABELS[*]}"
+            exit 1
+          fi
+
+          # 유효한 라벨 출력
+          echo "RELEASE_LABEL=${MATCHED_LABELS[0]}" >> $GITHUB_ENV
+
+      # 3. changeset 파일과 PR 라벨의 bump type 비교
+      - name: Check changeset files
+        run: |
+          # changeset 파일 확인
+          if ! ls .changeset/*.md 1> /dev/null 2>&1; then
+            echo "::error::No changeset files found in .changeset directory"
+            exit 1
+          fi
+
+          # changeset의 bump type 추출
+          BUMP_TYPE=$(cat .changeset/*.md | grep -o '"bump": "[^"]*"' | cut -d'"' -f4)
+
+          # 라벨에서 bump type 추출
+          LABEL_BUMP_TYPE=$(echo "$RELEASE_LABEL" | cut -d':' -f3)
+
+          # 비교
+          if [ "$BUMP_TYPE" != "$LABEL_BUMP_TYPE" ]; then
+            echo "::error::Changeset bump type ($BUMP_TYPE) does not match the PR label type ($LABEL_BUMP_TYPE)"
+            exit 1
+          fi
+
+      # 4. Node.js 설정
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      # 5. pnpm 설치
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+          run_install: false
+
+      # 5-1. pnpm 캐시 경로 출력
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      # 5-2. pnpm 캐시 설정
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      # 6. 의존성 설치
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 7. Lint 검사
+      - name: Run ESLint
+        run: pnpm lint
+
+      # 8. Format 검사
+      - name: Check formatting
+        run: pnpm format:check
+
+      # 9. 테스트 실행
+      - name: Run tests
+        run: pnpm test
+
+      # 10. 라이브러리 빌드 테스트
+      - name: Build floaty-core
+        run: time pnpm floaty:build:once
