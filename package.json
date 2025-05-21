@@ -9,6 +9,7 @@
   "scripts": {
     "floaty:build:watch": "pnpm --filter @seo-ny/floaty-core build",
     "floaty:build:once": "pnpm --filter @seo-ny/floaty-core build:once",
+    "floaty:docs:build": "pnpm --filter @seo-ny/floaty-core build:docs",
     "vanilla:sb": "pnpm --filter vanilla storybook",
     "vanilla:sb:build": "pnpm --filter vanilla build-storybook",
     "dev": "pnpm floaty:build:once && concurrently \"pnpm floaty:build:watch\" \"pnpm vanilla:sb\"",

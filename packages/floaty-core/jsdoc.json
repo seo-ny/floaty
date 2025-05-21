@@ -1,0 +1,20 @@
+{
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "source": {
+    "include": ["./src", "./README.md"],
+    "includePattern": ".+\\.js(doc|x)?$"
+  },
+  "opts": {
+    "encoding": "utf8",
+    "destination": "../../website/docs",
+    "recurse": true,
+    "template": "./node_modules/tui-jsdoc-template",
+    "readme": "../../docs/floaty-core-intro.md"
+  },
+  "templates": {
+    "cleverLinks": true,
+    "monospaceLinks": true
+  }
+}
