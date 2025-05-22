@@ -3,3 +3,6 @@ dist
 .nuxt
 output
 *.md
+pnpm-lock.yaml
+pnpm-workspace.yaml
+docs
