@@ -59,23 +59,11 @@ jobs:
             exit 1
           fi
 
-          # 디버깅: changeset 파일 내용 출력
-          echo "=== Changeset files content ==="
-          cat .changeset/*.md
-          echo "============================="
-
           # changeset의 bump type 추출
-          BUMP_TYPE=$(cat .changeset/*.md | grep -o '": [^"]*"' | cut -d'"' -f3)
-
-          # 디버깅: 추출된 bump type 출력
-          echo "Extracted BUMP_TYPE: $BUMP_TYPE"
-          echo "RELEASE_LABEL: $RELEASE_LABEL"
+          BUMP_TYPE=$(cat .changeset/*.md | grep -o '": [a-z]*' | sed 's/": //')
 
           # 라벨에서 bump type 추출
           LABEL_BUMP_TYPE=$(echo "$RELEASE_LABEL" | cut -d':' -f3)
-
-          # 디버깅: 추출된 라벨 bump type 출력
-          echo "Extracted LABEL_BUMP_TYPE: $LABEL_BUMP_TYPE"
 
           # 비교
           if [ "$BUMP_TYPE" != "$LABEL_BUMP_TYPE" ]; then
