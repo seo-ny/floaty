@@ -101,6 +101,7 @@ export const setupPosition = async (
 ) => {
   const scrollParents = elementUtils.getScrollParents(referenceEl);
 
+  // eslint-disable-next-line no-unused-vars
   const updatePosition = async (e) => {
     try {
       const options = { ...DEFAULT_OPTIONS, ...originOptions };

@@ -14,6 +14,7 @@
     "vanilla:sb:build": "pnpm --filter vanilla build-storybook",
     "dev": "pnpm floaty:build:once && concurrently \"pnpm floaty:build:watch\" \"pnpm vanilla:sb\"",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format:check": "prettier --check .",
     "test": "pnpm --filter @seo-ny/floaty-core test",
     "test:coverage": "pnpm --filter @seo-ny/floaty-core test:coverage",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.1",
     "@changesets/cli": "^2.29.4",
+    "@eslint/js": "^9.27.0",
     "concurrently": "^9.1.2",
     "eslint": "^9.25.0",
     "eslint-config-prettier": "^10.1.2",
