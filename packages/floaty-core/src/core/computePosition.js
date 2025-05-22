@@ -35,6 +35,7 @@ export const computePosition = async (
     placement: options.placement
   });
 
+  // eslint-disable-next-line no-unused-vars
   const overflows = layoutUtils.detectOverflow({
     referenceEl,
     floatingElRect: computedRect,

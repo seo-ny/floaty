@@ -1,18 +1,34 @@
-export default {
-  root: true,
-  env: {
-    browser: true,
-    es2021: true,
-    node: true
+import prettier from "eslint-config-prettier";
+
+export default [
+  // Apply to all JavaScript files
+  {
+    files: ["**/*.js", "**/*.mjs", "**/*.cjs"],
+    languageOptions: {
+      ecmaVersion: 2021,
+      sourceType: "module",
+      globals: {
+        // Browser globals
+        window: "readonly",
+        document: "readonly",
+        console: "readonly",
+        // Node.js globals
+        process: "readonly",
+        Buffer: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        global: "readonly"
+      }
+    },
+    rules: {
+      "no-unused-vars": "error",
+      "no-console": "off"
+    }
   },
-  parserOptions: {
-    ecmaVersion: 2021,
-    sourceType: "module"
-  },
-  extends: ["eslint:recommended", "prettier"],
-  rules: {
-    "no-unused-vars": "error",
-    "no-console": "off"
-  },
-  ignorePatterns: ["node_modules/", "dist/"]
-};
+  // Prettier config to disable conflicting rules
+  prettier,
+  // Global ignores (replaces ignorePatterns)
+  {
+    ignores: ["node_modules/", "**/*/dist/", "**/*.test.js"]
+  }
+];
