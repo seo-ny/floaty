@@ -60,7 +60,7 @@ jobs:
           fi
 
           # changeset의 bump type 추출
-          BUMP_TYPE=$(cat .changeset/*.md | grep -o '"bump": "[^"]*"' | cut -d'"' -f4)
+          BUMP_TYPE=$(cat .changeset/*.md | grep -o '": [a-z]*' | sed 's/": //')
 
           # 라벨에서 bump type 추출
           LABEL_BUMP_TYPE=$(echo "$RELEASE_LABEL" | cut -d':' -f3)
@@ -71,19 +71,19 @@ jobs:
             exit 1
           fi
 
-      # 4. Node.js 설정
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "pnpm"
-
-      # 5. pnpm 설치
+      # 4. pnpm 설치
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 9
           run_install: false
+
+      # 5. Node.js 설정
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
 
       # 5-1. pnpm 캐시 경로 출력
       - name: Get pnpm store directory
