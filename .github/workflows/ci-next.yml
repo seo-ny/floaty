@@ -60,7 +60,7 @@ jobs:
           fi
 
           # changeset의 bump type 추출
-          BUMP_TYPE=$(cat .changeset/*.md | grep -o '"bump": "[^"]*"' | cut -d'"' -f4)
+          BUMP_TYPE=$(cat .changeset/*.md | grep -o '": [^"]*"' | cut -d'"' -f3)
 
           # 라벨에서 bump type 추출
           LABEL_BUMP_TYPE=$(echo "$RELEASE_LABEL" | cut -d':' -f3)
