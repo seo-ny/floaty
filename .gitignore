@@ -34,3 +34,6 @@ coverage/
 # website
 website/docs/
 website/playground/
+
+# sandbox
+sandbox/
