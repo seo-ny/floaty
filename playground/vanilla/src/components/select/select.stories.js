@@ -4,6 +4,11 @@ import { getColorList } from "../../api.js";
 export default {
   title: "components/select",
   render: Template,
+  loaders: [
+    async () => ({
+      colorList: await getColorList()
+    })
+  ],
   args: {
     placement: "bottom",
     // strategy: "absolute",
@@ -73,12 +78,10 @@ export default {
   }
 };
 
-const colorList = await getColorList();
-
 const getDefaultArgsWithStrategy = (strategy = "absolute") => {
   return {
     select: {
-      options: colorList,
+      options: [],
       placeholder: "선택하시오.",
       maxVisibleItems: 8
     },
@@ -97,9 +100,27 @@ const getDefaultArgsWithStrategy = (strategy = "absolute") => {
 };
 
 export const Absolute = {
-  args: getDefaultArgsWithStrategy("absolute")
+  args: getDefaultArgsWithStrategy("absolute"),
+  render: (args, { loaded }) => {
+    return Template({
+      ...args,
+      select: {
+        ...args.select,
+        options: loaded.colorList
+      }
+    });
+  }
 };
 
 export const Fixed = {
-  args: getDefaultArgsWithStrategy("fixed")
+  args: getDefaultArgsWithStrategy("fixed"),
+  render: (args, { loaded }) => {
+    return Template({
+      ...args,
+      select: {
+        ...args.select,
+        options: loaded.colorList
+      }
+    });
+  }
 };

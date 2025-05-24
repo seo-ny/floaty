@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "rm -rf ../../website/playground && storybook build --output-dir ../../website/playground"
   },
   "description": "A playground to test floaty-core in vanilla JS",
   "devDependencies": {
