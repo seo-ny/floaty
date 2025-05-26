@@ -1,3 +1,23 @@
+/**
+ * @module core/computePosition
+ * @description 부유 요소의 위치를 계산합니다.
+ */
+
+/**
+ * @typedef {BaseOptions} ComputePositionOptions
+ */
+
+/**
+ * 스크롤, 리사이징 등 다양한 상황에서 부유 요소의 위치 계산
+ *
+ * @function computePosition
+ * @memberof module:core/computePosition
+ * @param {HTMLElement} referenceEl 기준 요소
+ * @param {HTMLElement} floatingEl 부유 요소
+ * @param {ComputePositionOptions} options 위치 계산을 위한 옵션들
+ * @returns {Rect} 계산된 rect 값
+ */
+
 import { computeWithBehaviors } from "../behaviors";
 import { DEFAULT_OPTIONS } from "../constants";
 import { errorUtils, layoutUtils, rectUtils, validateUtils } from "../utils";
