@@ -82,11 +82,8 @@ jobs:
         run: |
           VERSION=$(node -p "require('./packages/floaty-core/package.json').version")
           NOTES=$(awk -v ver="## ${VERSION}" '
-            function isVersionLine(line) {
-              return match(line, /^## [0-9]+\.[0-9]+\.[0-9]+/)
-            }
             $0 ~ ver {capture=1; next}
-            capture && isVersionLine($0) {exit}
+            capture && /^## [0-9]+\.[0-9]+\.[0-9]+/ {exit}
             capture {print}
           ' packages/floaty-core/CHANGELOG.md)
           echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
