@@ -11,7 +11,6 @@ export default {
   ],
   args: {
     placement: "bottom",
-    // strategy: "absolute",
     boundary: "clippingAncestors",
     rootBoundary: "viewport",
     padding: 0,
@@ -43,11 +42,11 @@ export default {
         "right-end"
       ]
     },
-    // strategy: {
-    //   description: "floatingEl의 포지셔닝 방식",
-    //   control: "inline-radio",
-    //   options: ["absolute", "fixed"]
-    // },
+    strategy: {
+      table: {
+        disable: true
+      }
+    },
     boundary: {
       description:
         "(개발자가 설정할) floatingEl이 넘치는지 판단할 기준이 되는 경계 (여길 넘으면 안돼!)",
@@ -74,6 +73,11 @@ export default {
       description:
         "위치 계산 직후 실행될 사용자 정의 로직 (ex. 스타일 업데이트)",
       control: "object"
+    },
+    select: {
+      table: {
+        disable: true
+      }
     }
   }
 };
