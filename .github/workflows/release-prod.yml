@@ -64,7 +64,7 @@ jobs:
         with:
           publish: pnpm ci:publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # 5-1. npm 레지스트리 배포 여부 확인
@@ -102,7 +102,7 @@ jobs:
           RELEASE_TAG: v${{ steps.changelog.outputs.VERSION }}
           RELEASE_NOTES: ${{ steps.changelog.outputs.NOTES }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           script: |
             const { owner, repo } = context.repo;
             const tag = process.env.RELEASE_TAG;
@@ -129,6 +129,6 @@ jobs:
       - name: Deploy Storybook to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           publish_dir: ./website
           publish_branch: gh-pages
