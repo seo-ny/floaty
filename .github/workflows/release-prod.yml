@@ -1,5 +1,9 @@
 name: Release (release:prod - Main Merge)
 
+permissions:
+  contents: write
+  pull-requests: write
+
 on:
   pull_request:
     types:
@@ -55,12 +59,10 @@ jobs:
 
       # 5. 버전 업데이트 PR 생성 또는 npm 레지스트리 배포
       - name: Create release pull request or publish
+        id: changesets
         uses: changesets/action@v1
         with:
-          publish: |
-            if pnpm ci:publish; then
-              echo "published=true" > .published
-            fi
+          publish: pnpm ci:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -68,8 +70,10 @@ jobs:
       # 5-1. npm 레지스트리 배포 여부 확인
       - name: Check if published
         id: check-published
+        env:
+          PUBLISHED: ${{ steps.changesets.outputs.published }}
         run: |
-          if [ -f .published ]; then
+          if [ "$PUBLISHED" = "true" ]; then
             echo "PUBLISHED=true" >> $GITHUB_OUTPUT
           else
             echo "PUBLISHED=false" >> $GITHUB_OUTPUT
