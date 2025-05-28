@@ -1,5 +1,9 @@
 name: Release (release:prod - Main Merge)
 
+permissions:
+  contents: write
+  pull-requests: write
+
 on:
   pull_request:
     types:
