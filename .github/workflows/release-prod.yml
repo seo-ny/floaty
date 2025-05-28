@@ -38,6 +38,8 @@ jobs:
         with:
           node-version: "20"
           cache: "pnpm"
+          registry-url: "https://registry.npmjs.org"
+          scope: "@seo-ny"
 
       # 3-1. pnpm 캐시 경로 출력
       - name: Get pnpm store directory
