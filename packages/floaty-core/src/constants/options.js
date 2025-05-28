@@ -4,5 +4,6 @@ export const DEFAULT_OPTIONS = {
   boundary: "clippingAncestors",
   rootBoundary: "viewport",
   padding: 0,
-  behaviors: []
+  behaviors: [],
+  onAfterComputePosition: null
 };
