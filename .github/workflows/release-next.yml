@@ -12,9 +12,41 @@ on:
       - dev
 
 jobs:
-  release:
+  check-labels:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    outputs:
+      has_release_label: ${{ steps.check-pr-labels.outputs.has_release_label }}
+
+    steps:
+      # 1. 레포지토리 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. PR 라벨 확인
+      - name: Check PR labels
+        id: check-pr-labels
+        run: |
+          # PR 라벨 목록 가져오기
+          LABELS=$(echo '${{ toJSON(github.event.pull_request.labels.*.name) }}' | jq -r '.[]')
+
+          # 릴리즈 라벨 확인
+          for label in $LABELS; do
+            if [[ "$label" =~ ^release:next:(patch|minor|major)$ ]]; then
+              echo "has_release_label=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          done
+          echo "has_release_label=false" >> $GITHUB_OUTPUT
+
+  release:
+    needs: check-labels
+    if: needs.check-labels.outputs.has_release_label == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      published: ${{ steps.check-published.outputs.published }}
 
     steps:
       # 1. 레포지토리 체크아웃
@@ -36,6 +68,8 @@ jobs:
         with:
           node-version: "20"
           cache: "pnpm"
+          registry-url: "https://registry.npmjs.org"
+          scope: "@seo-ny"
 
       # 3-1. pnpm 캐시 경로 출력
       - name: Get pnpm store directory
@@ -57,31 +91,37 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # 5. 버전 업데이트 PR 생성 또는 npm 레지스트리 배포
+      # 5. changeset baseBranch를 dev 브랜치로 설정
+      - name: Set baseBranch to dev
+        run: |
+          jq '.baseBranch = "dev"' .changeset/config.json > tmp.json && mv tmp.json .changeset/config.json
+
+      # 6. 버전 업데이트 PR 생성 또는 npm 레지스트리 배포
       - name: Create release pull request or publish
         id: changesets
         uses: changesets/action@v1
         with:
           publish: pnpm ci:publish:next
+          version: prerelease
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          CHANGESETS_PREID: next
 
-      # 5-1. npm 레지스트리 배포 여부 확인
+      # 7. npm 레지스트리 배포 여부 확인
       - name: Check if published
         id: check-published
-        env:
-          PUBLISHED: ${{ steps.changesets.outputs.published }}
         run: |
-          if [ "$PUBLISHED" = "true" ]; then
-            echo "PUBLISHED=true" >> $GITHUB_OUTPUT
-          else
-            echo "PUBLISHED=false" >> $GITHUB_OUTPUT
-          fi
+          echo "published=${{ steps.changesets.outputs.published }}" >> $GITHUB_OUTPUT
 
-      # 5-2. CHANGELOG 추출
+  post-release:
+    needs: release
+    if: needs.release.outputs.published == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. CHANGELOG 추출
       - name: Read CHANGELOG for Release Notes
-        if: steps.check-published.outputs.PUBLISHED == 'true'
         id: changelog
         run: |
           VERSION=$(node -p "require('./packages/floaty-core/package.json').version")
@@ -95,7 +135,7 @@ jobs:
           echo "$NOTES" >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
-      # 6. Github 릴리즈
+      # 2. Github 릴리즈
       - name: Create GitHub Release
         uses: actions/github-script@v7
         env:
