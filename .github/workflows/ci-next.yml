@@ -31,7 +31,7 @@ jobs:
             echo "is_release_pr=false" >> $GITHUB_OUTPUT
           fi
 
-      # 3. PR 라벨 확인 (릴리즈 PR이 아닐 때만)
+      # 3. PR 라벨 확인
       - name: Check PR labels
         id: check-pr-labels
         if: ${{ steps.check-release-pr.outputs.is_release_pr == 'false' }}
@@ -62,7 +62,7 @@ jobs:
           # 유효한 라벨 출력
           echo "RELEASE_LABEL=${MATCHED_LABELS[0]}" >> $GITHUB_ENV
 
-      # 4. changeset 파일과 PR 라벨의 bump type 비교 (릴리즈 PR이 아닐 때만)
+      # 4. changeset 파일과 PR 라벨의 bump type 비교
       - name: Check changeset files
         if: ${{ steps.check-release-pr.outputs.is_release_pr == 'false' && steps.check-pr-labels.outputs.RELEASE_LABEL != 'no-release' }}
         run: |
