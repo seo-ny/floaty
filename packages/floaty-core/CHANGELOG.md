@@ -1,5 +1,11 @@
 # @seo-ny/floaty-core
 
+## 0.1.2
+
+### Patch Changes
+
+- [#12](https://github.com/seo-ny/floaty/pull/12) [`a241374`](https://github.com/seo-ny/floaty/commit/a241374d6f291538088883eaa75522fd0d909cde) Thanks [@seo-ny](https://github.com/seo-ny)! - patch version update
+
 ## 0.1.1
 
 ❌ 릴리즈 실패 (CI/CD 실패)
