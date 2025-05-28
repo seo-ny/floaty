@@ -33,13 +33,14 @@ jobs:
 
       # 3. PR 라벨 확인 (릴리즈 PR이 아닐 때만)
       - name: Check PR labels
+        id: check-pr-labels
         if: ${{ steps.check-release-pr.outputs.is_release_pr == 'false' }}
         run: |
           # PR 라벨 목록 가져오기
           LABELS=$(echo '${{ toJSON(github.event.pull_request.labels.*.name) }}' | jq -r '.[]')
 
           # 유효한 라벨 목록
-          VALID_LABELS=("release:next:patch" "release:next:minor" "release:next:major")
+          VALID_LABELS=("release:next:patch" "release:next:minor" "release:next:major" "no-release")
 
           # 유효한 라벨 필터링
           MATCHED_LABELS=()
@@ -54,7 +55,7 @@ jobs:
           MATCHED_COUNT=${#MATCHED_LABELS[@]}
 
           if [ "$MATCHED_COUNT" -ne 1 ]; then
-            echo "::error::Exactly one valid release label must be present. Found $MATCHED_COUNT. Expected one of: ${VALID_LABELS[*]}"
+            echo "::error::Exactly one valid label must be present. Found $MATCHED_COUNT. Expected one of: ${VALID_LABELS[*]}"
             exit 1
           fi
 
@@ -63,7 +64,7 @@ jobs:
 
       # 4. changeset 파일과 PR 라벨의 bump type 비교 (릴리즈 PR이 아닐 때만)
       - name: Check changeset files
-        if: ${{ steps.check-release-pr.outputs.is_release_pr == 'false' }}
+        if: ${{ steps.check-release-pr.outputs.is_release_pr == 'false' && steps.check-pr-labels.outputs.RELEASE_LABEL != 'no-release' }}
         run: |
           # changeset 파일 확인
           if ! ls .changeset/*.md 1> /dev/null 2>&1; then
