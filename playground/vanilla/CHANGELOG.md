@@ -1,6 +1,6 @@
 # vanilla
 
-## 1.0.1
+## 0.1.0
 
 ### Patch Changes
 
