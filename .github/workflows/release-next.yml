@@ -15,6 +15,8 @@ jobs:
   release:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    outputs:
+      published: ${{ steps.check-published.outputs.published }}
 
     steps:
       # 1. 레포지토리 체크아웃
@@ -72,21 +74,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # 6-1. npm 레지스트리 배포 여부 확인
+      # 7. npm 레지스트리 배포 여부 확인
       - name: Check if published
         id: check-published
-        env:
-          PUBLISHED: ${{ steps.changesets.outputs.published }}
         run: |
-          if [ "$PUBLISHED" = "true" ]; then
-            echo "PUBLISHED=true" >> $GITHUB_OUTPUT
-          else
-            echo "PUBLISHED=false" >> $GITHUB_OUTPUT
-          fi
+          echo "published=${{ steps.changesets.outputs.published }}" >> $GITHUB_OUTPUT
 
-      # 6-2. CHANGELOG 추출
+  post-release:
+    needs: release
+    if: needs.release.outputs.published == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      # 8. CHANGELOG 추출
       - name: Read CHANGELOG for Release Notes
-        if: steps.check-published.outputs.PUBLISHED == 'true'
         id: changelog
         run: |
           VERSION=$(node -p "require('./packages/floaty-core/package.json').version")
@@ -100,7 +101,7 @@ jobs:
           echo "$NOTES" >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
-      # 7. Github 릴리즈
+      # 9. Github 릴리즈
       - name: Create GitHub Release
         uses: actions/github-script@v7
         env:
