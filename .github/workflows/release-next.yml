@@ -123,7 +123,7 @@ jobs:
       - name: Read CHANGELOG for Release Notes
         id: changelog
         run: |
-          VERSION=$(node -p "require('./packages/floaty-core/package.json').version")
+          VERSION=$(node -p "require('../../packages/floaty-core/package.json').version")
           NOTES=$(awk -v ver="## ${VERSION}" '
             $0 ~ ver {capture=1; next}
             capture && /^## [0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+\.[0-9]+)?/ {exit}
