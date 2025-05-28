@@ -1,5 +1,7 @@
 # vanilla
 
+vanilla는 floaty-core를 위한 storybook playground로써 실제로 npm 배포되지 않습니다. 해당 문서는 단순 버전 관리를 위한 문서임을 밝힙니다.
+
 ## 0.1.0
 
 ### Patch Changes

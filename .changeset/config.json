@@ -11,5 +11,6 @@
   "linked": [],
   "access": "public",
   "updateInternalDependencies": "patch",
-  "ignore": ["vanilla"]
+  "ignore": ["vanilla"],
+  "baseBranch": "dev"
 }
