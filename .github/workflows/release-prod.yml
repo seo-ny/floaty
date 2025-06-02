@@ -88,11 +88,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 8. CHANGELOG 추출
+      # 1. 레포지토리 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. CHANGELOG 추출
       - name: Read CHANGELOG for Release Notes
         id: changelog
         run: |
-          VERSION=$(node -p "require('../../packages/floaty-core/package.json').version")
+          VERSION=$(node -p "require('./packages/floaty-core/package.json').version")
           NOTES=$(awk -v ver="## ${VERSION}" '
             $0 ~ ver {capture=1; next}
             capture && /^## [0-9]+\.[0-9]+\.[0-9]+/ {exit}
@@ -103,7 +109,7 @@ jobs:
           echo "$NOTES" >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
-      # 9. Github 릴리즈
+      # 3. Github 릴리즈
       - name: Create GitHub Release
         uses: actions/github-script@v7
         env:
