@@ -108,29 +108,30 @@ jobs:
             echo "found=false" >> $GITHUB_OUTPUT
           fi
 
-      # 7. (.changeset/.md 파일이 존재하면) 버전 업데이트
+      # 7. (.changeset/.md 파일이 존재하면) 새로운 브랜치 생성
+      - name: Create prerelease branch
+        if: steps.check_changesets.outputs.found == 'true'
+        id: branch
+        run: |
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          BRANCH_NAME=prerelease/next-$TIMESTAMP
+          git checkout -b $BRANCH_NAME
+          echo "branch=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+      # 8. (〃) 버전 업데이트
       - name: Run changeset version
         if: steps.check_changesets.outputs.found == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: pnpm ci:version:next
 
-      # 7-1. (〃) 버전 출력
+      # 8-1. (〃) 버전 출력
       - name: Get updated version from package.json
         if: steps.check_changesets.outputs.found == 'true'
         id: version
         run: |
           VERSION=$(node -p "require('./packages/floaty-core/package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      # 8. (〃) 새로운 브랜치 생성
-      - name: Create prerelease branch
-        if: steps.check_changesets.outputs.found == 'true'
-        id: branch
-        run: |
-          BRANCH_NAME=prerelease/next-${{ steps.version.outputs.version }}
-          git checkout -b $BRANCH_NAME
-          echo "branch=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
       # 9. (〃) 새로운 브랜치 푸시
       - name: Push prerelease branch
