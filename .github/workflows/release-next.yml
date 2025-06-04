@@ -108,31 +108,39 @@ jobs:
             echo "found=false" >> $GITHUB_OUTPUT
           fi
 
-      # 7. (.changeset/.md 파일이 존재하면) 새로운 브랜치 생성
-      - name: Create branch
-        if: steps.check_changesets.outputs.found == 'true'
-        run: |
-          git checkout -b prerelease/next-version
-
-      # 8. (〃) 프리릴리즈 버전 업데이트
+      # 7. (.changeset/.md 파일이 존재하면) 버전 업데이트
       - name: Run changeset version
+        if: steps.check_changesets.outputs.found == 'true'
+        run: pnpm ci:version:next
+
+      # 7-1. (〃) 버전 출력
+      - name: Get updated version from package.json
+        if: steps.check_changesets.outputs.found == 'true'
+        id: version
+        run: |
+          VERSION=$(node -p "require('./packages/floaty-core/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      # 8. (〃) 새로운 브랜치 생성
+      - name: Create prerelease branch
+        if: steps.check_changesets.outputs.found == 'true'
+        id: branch
+        run: |
+          BRANCH_NAME=prerelease/next-${{ steps.version.outputs.version }}
+          git checkout -b $BRANCH_NAME
+          echo "branch=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+      # 9. (〃) 새로운 브랜치 푸시
+      - name: Push prerelease branch
         if: steps.check_changesets.outputs.found == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          pnpm ci:version:next
           git add .
           git commit -m "chore: prerelease 버전 업데이트"
-
-      # 9. (〃) 현재 버전 출력
-      - name: Get current version
-        id: get-version
-        if: steps.check_changesets.outputs.found == 'true'
-        run: |
-          VERSION=$(node -p "require('./packages/floaty-core/package.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          git push origin ${{ steps.branch.outputs.branch }}
 
       # 10. (〃) 프리릴리즈 버전 PR 생성
       - name: Create PR to dev
@@ -141,10 +149,10 @@ jobs:
         with:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           base: dev
-          branch: prerelease/next-${{ steps.get-version.outputs.version }}
-          title: "chore: prerelease 버전 업데이트"
+          branch: ${{ steps.branch.outputs.branch }}
+          title: "chore: prerelease 버전 업데이트 (${{ steps.version.outputs.version }})"
           body: |
-            ## ${{ steps.get-version.outputs.version }}
+            ## ${{ steps.version.outputs.version }}
             Changeset에 따라 버전 업데이트 및 CHANGELOG 수정
 
       # 11. (.changeset/.md 파일이 존재하지 않으면) npm 레지스트리 배포
