@@ -117,6 +117,8 @@ jobs:
       # 8. (〃) 프리릴리즈 버전 업데이트
       - name: Run changeset version
         if: steps.check_changesets.outputs.found == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -137,7 +139,7 @@ jobs:
         if: steps.check_changesets.outputs.found == 'true'
         uses: peter-evans/create-pull-request@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           base: dev
           branch: prerelease/next-${{ steps.get-version.outputs.version }}
           title: "chore: prerelease 버전 업데이트"
