@@ -30,7 +30,7 @@ jobs:
         id: check-pr-labels
         run: |
           # PR 라벨 목록 가져오기
-          LABELS=$(echo '${{ toJSON(github.event.pull_request.labels.*.name) }}' | jq -r '.[]')
+          LABELS=$(echo "${{ toJSON(github.event.pull_request.labels.*.name) }}" | jq -r '.[]')
 
           # 릴리즈 라벨 확인
           for label in $LABELS; do
@@ -108,8 +108,14 @@ jobs:
             echo "found=false" >> $GITHUB_OUTPUT
           fi
 
-      # 7. .changeset/.md 파일이 존재하면, 프리릴리즈 버전 PR 생성
-      - name: Create prerelease version PR
+      # 7. (.changeset/.md 파일이 존재하면) 새로운 브랜치 생성
+      - name: Create branch
+        if: steps.check_changesets.outputs.found == 'true'
+        run: |
+          git checkout -b prerelease/next-version
+
+      # 8. (〃) 프리릴리즈 버전 업데이트
+      - name: Run changeset version
         if: steps.check_changesets.outputs.found == 'true'
         run: |
           git config --global user.name "github-actions[bot]"
@@ -117,21 +123,40 @@ jobs:
           pnpm ci:version:next
           git add .
           git commit -m "chore: prerelease 버전 업데이트"
-          git push origin HEAD:prerelease/next-${{ github.sha }}
 
-      # 8. .changeset/.md 파일이 존재하지 않으면, npm 레지스트리 배포 (프리릴리즈)
+      # 9. (〃) 현재 버전 출력
+      - name: Get current version
+        id: get-version
+        if: steps.check_changesets.outputs.found == 'true'
+        run: |
+          VERSION=$(node -p "require('./packages/floaty-core/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      # 10. (〃) 프리릴리즈 버전 PR 생성
+      - name: Create PR to dev
+        if: steps.check_changesets.outputs.found == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: dev
+          branch: prerelease/next-${{ steps.get-version.outputs.version }}
+          title: "chore: prerelease 버전 업데이트"
+          body: |
+            ## ${{ steps.get-version.outputs.version }}
+            Changeset에 따라 버전 업데이트 및 CHANGELOG 수정
+
+      # 11. (.changeset/.md 파일이 존재하지 않으면) npm 레지스트리 배포
       - name: Publish if no .changeset/*.md
         if: steps.check_changesets.outputs.found == 'false'
         run: |
           OUTPUT=$(pnpm ci:publish:next)
           echo "$OUTPUT" | tee publish-output.txt
 
-      # 9. npm 레지스트리 배포 여부 확인
+      # 12. npm 레지스트리 배포 여부 확인
       - name: Set output if published
         id: set-published
-        if: steps.check_changesets.outputs.found == 'false'
         run: |
-          if grep -q "Successfully published:" publish-output.txt; then
+          if [ -f publish-output.txt ] && grep -q "Successfully published:" publish-output.txt; then
             echo "published=true" >> $GITHUB_OUTPUT
           else
             echo "published=false" >> $GITHUB_OUTPUT
