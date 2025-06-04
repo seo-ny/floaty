@@ -30,7 +30,7 @@ jobs:
         id: check-pr-labels
         run: |
           # PR 라벨 목록 가져오기
-          LABELS=$(echo "${{ toJSON(github.event.pull_request.labels.*.name) }}" | jq -r '.[]')
+          LABELS=$(echo '${{ toJSON(github.event.pull_request.labels.*.name) }}' | jq -r '.[]')
 
           # 릴리즈 라벨 확인
           for label in $LABELS; do
