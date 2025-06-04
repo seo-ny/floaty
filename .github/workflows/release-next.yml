@@ -131,7 +131,7 @@ jobs:
           echo "branch=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
       # 9. (〃) 새로운 브랜치 푸시
-      - name: Run changeset version
+      - name: Push prerelease branch
         if: steps.check_changesets.outputs.found == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
