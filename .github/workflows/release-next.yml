@@ -91,14 +91,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # 5. 프리릴리즈 모드 진입
-      - name: Ensure pre.json exists
-        run: |
-          if [ ! -f .changeset/pre.json ]; then
-            pnpm ci:pre:enter
-          fi
-
-      # 6. .changeset/.md 파일 존재 여부 확인
+      # 5. .changeset/.md 파일 존재 여부 확인
       - name: Check if changesets exist
         id: check_changesets
         run: |
@@ -108,7 +101,7 @@ jobs:
             echo "found=false" >> $GITHUB_OUTPUT
           fi
 
-      # 7. (.changeset/.md 파일이 존재하면) 새로운 브랜치 생성
+      # 6. (.changeset/.md 파일이 존재하면) 새로운 브랜치 생성
       - name: Create prerelease branch
         if: steps.check_changesets.outputs.found == 'true'
         id: branch
@@ -117,6 +110,14 @@ jobs:
           BRANCH_NAME=prerelease/next-$TIMESTAMP
           git checkout -b $BRANCH_NAME
           echo "branch=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+      # 7. 프리릴리즈 모드 진입
+      - name: Ensure pre.json exists
+        if: steps.check_changesets.outputs.found == 'true'
+        run: |
+          if [ ! -f .changeset/pre.json ]; then
+            pnpm ci:pre:enter
+          fi
 
       # 8. (〃) 버전 업데이트
       - name: Run changeset version
