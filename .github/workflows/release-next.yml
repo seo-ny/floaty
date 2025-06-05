@@ -61,19 +61,25 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # 5. .changeset/.md 파일 존재 여부 확인
-      - name: Check if changesets exist
-        id: check_changesets
+      # 5. 릴리즈 PR 여부 확인
+      - name: Check if release PR
+        id: check-release-pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
-          if ls .changeset/*.md 1> /dev/null 2>&1; then
-            echo "found=true" >> $GITHUB_OUTPUT
+          # 현재 PR 제목 가져오기
+          PR_TITLE=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq .title)
+          echo "Current PR title: $PR_TITLE"
+
+          if [[ "$PR_TITLE" == "Prerelease 버전 업데이트"* ]]; then
+            echo "is_release_pr=true" >> $GITHUB_OUTPUT
           else
-            echo "found=false" >> $GITHUB_OUTPUT
+            echo "is_release_pr=false" >> $GITHUB_OUTPUT
           fi
 
-      # 6. (.changeset/.md 파일이 존재하면) 새로운 브랜치 생성
+      # 6. (현재 PR이 릴리즈 PR이 아니면) 새로운 브랜치 생성
       - name: Create prerelease branch
-        if: steps.check_changesets.outputs.found == 'true'
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
         id: branch
         run: |
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
@@ -95,7 +101,7 @@ jobs:
 
       # 7. 프리릴리즈 모드 진입
       - name: Ensure pre.json exists
-        if: steps.check_changesets.outputs.found == 'true'
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
         run: |
           if [ ! -f .changeset/pre.json ]; then
             pnpm ci:pre:enter
@@ -103,7 +109,7 @@ jobs:
 
       # 7-1. 디버깅 정보 출력
       - name: Debug environment
-        if: steps.check_changesets.outputs.found == 'true'
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
         run: |
           echo "Current version: $(node -p "require('./packages/floaty-core/package.json').version")"
           echo "=== Changeset files: ==="
@@ -115,7 +121,7 @@ jobs:
 
       # 8. (〃) 버전 업데이트
       - name: Run changeset version
-        if: steps.check_changesets.outputs.found == 'true'
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
@@ -128,7 +134,7 @@ jobs:
 
       # 8-1. (〃) 버전 출력
       - name: Get updated version from package.json
-        if: steps.check_changesets.outputs.found == 'true'
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
         id: version
         run: |
           VERSION=$(node -p "require('./packages/floaty-core/package.json').version")
@@ -136,7 +142,7 @@ jobs:
 
       # 9. (〃) 새로운 브랜치 푸시
       - name: Push prerelease branch
-        if: steps.check_changesets.outputs.found == 'true'
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
@@ -153,7 +159,7 @@ jobs:
 
       # 10. (〃) 프리릴리즈 버전 PR 생성
       - name: Create PR to dev
-        if: steps.check_changesets.outputs.found == 'true'
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
@@ -187,9 +193,9 @@ jobs:
           echo "=== After PR creation ==="
           gh pr list --head ${{ steps.branch.outputs.branch }} --json number,title,state
 
-      # 11. (.changeset/.md 파일이 존재하지 않으면) npm 레지스트리 배포
-      - name: Publish if no .changeset/*.md
-        if: steps.check_changesets.outputs.found == 'false'
+      # 11. (현재 PR이 릴리즈 PR이면) npm 레지스트리 배포
+      - name: Publish if not release PR
+        if: steps.check-release-pr.outputs.is_release_pr == 'true'
         run: |
           OUTPUT=$(pnpm ci:publish:next)
           echo "$OUTPUT" | tee publish-output.txt
