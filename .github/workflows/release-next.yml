@@ -124,11 +124,11 @@ jobs:
         if: steps.check_changesets.outputs.found == 'true'
         run: |
           echo "Current version: $(node -p "require('./packages/floaty-core/package.json').version")"
-          echo "Changeset files:"
+          echo "==Changeset files:=="
           ls -la .changeset/
-          echo "pre.json content:"
+          echo "==pre.json content:=="
           cat .changeset/pre.json
-          echo "Changeset content:"
+          echo "==Changeset content:=="
           cat .changeset/*.md
 
       # 8. (〃) 버전 업데이트
@@ -138,8 +138,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
           pnpm ci:version:next
-          echo "Version after changeset: $(node -p "require('./packages/floaty-core/package.json').version")"
+          echo "Version after changeset: $(node -p "require('./packages/floaty-core/package.json').version")" 
+          echo "==Git status:=="
           git status
+          echo "==Git diff:=="
           git diff
 
       # 8-1. (〃) 버전 출력
@@ -162,6 +164,11 @@ jobs:
           git commit -m "chore: prerelease 버전 업데이트"
           git push origin ${{ steps.branch.outputs.branch }}
 
+          # 변경사항 확인
+          echo "=== Checking changes ==="
+          git diff dev..${{ steps.branch.outputs.branch }} --name-status
+          git diff dev..${{ steps.branch.outputs.branch }} packages/floaty-core/package.json
+
       # 10. (〃) 프리릴리즈 버전 PR 생성
       - name: Create PR to dev
         if: steps.check_changesets.outputs.found == 'true'
@@ -170,10 +177,15 @@ jobs:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           base: dev
           branch: ${{ steps.branch.outputs.branch }}
-          title: "chore: prerelease 버전 업데이트 (${{ steps.version.outputs.version }})"
+          title: "Version packages (${{ steps.version.outputs.version }})"
           body: |
             ## ${{ steps.version.outputs.version }}
-            Changeset에 따라 버전 업데이트 및 CHANGELOG 수정
+
+            ## 변경사항
+            - 버전 업데이트: ${{ steps.version.outputs.version }}
+            - CHANGELOG 업데이트
+            - changeset 파일 정리
+          commit-message: "chore: prerelease 버전 업데이트 (${{ steps.version.outputs.version }})"
 
       # 11. (.changeset/.md 파일이 존재하지 않으면) npm 레지스트리 배포
       - name: Publish if no .changeset/*.md
