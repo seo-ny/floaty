@@ -16,7 +16,7 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     outputs:
-      published: ${{ steps.set-published.outputs.published }}
+      published: ${{ steps.publish.outputs.published }}
 
     steps:
       # 1. 레포지토리 체크아웃
@@ -193,23 +193,19 @@ jobs:
           echo "=== After PR creation ==="
           gh pr list --head ${{ steps.branch.outputs.branch }} --json number,title,state
 
-      # 11. (현재 PR이 릴리즈 PR이면) npm 레지스트리 배포
+      # 11. (현재 PR이 릴리즈 PR이면) npm 배포 및 배포 여부 확인
       - name: Publish if not release PR
         if: steps.check-release-pr.outputs.is_release_pr == 'true'
+        id: publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          OUTPUT=$(pnpm ci:publish:next)
-          echo "$OUTPUT" | tee publish-output.txt
-
-      # 12. npm 레지스트리 배포 여부 확인
-      - name: Set output if published
-        id: set-published
-        run: |
-          if [ -f publish-output.txt ] && grep -q "Successfully published:" publish-output.txt; then
+          if pnpm ci:publish:next; then
             echo "published=true" >> $GITHUB_OUTPUT
           else
             echo "published=false" >> $GITHUB_OUTPUT
+            echo "❌ Failed to publish packages"
+            exit 1
           fi
 
   post-release:
