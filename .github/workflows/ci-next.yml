@@ -61,7 +61,7 @@ jobs:
           MATCHED_COUNT=${#MATCHED_LABELS[@]}
 
           if [ "$MATCHED_COUNT" -ne 1 ]; then
-            echo "::error::Exactly one valid label must be present. Found $MATCHED_COUNT. Expected one of: ${VALID_LABELS[*]}"
+            echo "❌ Exactly one valid label must be present. Found $MATCHED_COUNT. Expected one of: ${VALID_LABELS[*]}"
             exit 1
           fi
 
@@ -72,23 +72,34 @@ jobs:
       - name: Check changeset files
         if: ${{ steps.check-release-pr.outputs.is_release_pr == 'false' }}
         run: |
-          # changeset 파일 확인
-          if ! ls .changeset/*.md 1> /dev/null 2>&1; then
-            echo "::error::No changeset files found in .changeset directory"
+          # PR에 새로 추가된 changeset 파일 확인
+          NEW_CHANGESET_FILES=$(git diff --name-only origin/dev...HEAD .changeset/ | grep '\.md$')
+
+          if [ -z "$NEW_CHANGESET_FILES" ]; then
+            echo "❌ No new changeset files found in this PR"
             exit 1
           fi
 
-          # changeset의 bump type 추출
-          BUMP_TYPE=$(cat .changeset/*.md | grep -o '": [a-z]*' | sed 's/": //')
+          # PR에 changeset 파일이 하나만 추가되었는지 확인
+          CHANGESET_COUNT=$(echo "$NEW_CHANGESET_FILES" | wc -l)
+          if [ "$CHANGESET_COUNT" -gt 1 ]; then
+            echo "❌ Multiple changeset files added in this PR. Please include only one changeset file per PR."
+            echo "Found files:"
+            echo "$NEW_CHANGESET_FILES"
+            exit 1
+          fi
 
           # 라벨에서 bump type 추출
           LABEL_BUMP_TYPE=$(echo "$RELEASE_LABEL" | cut -d':' -f3)
 
-          # 비교
+          # 새로 추가된 changeset 파일의 bump type 확인
+          BUMP_TYPE=$(grep -o '": [a-z]*' "$NEW_CHANGESET_FILES" | sed 's/": //')
           if [ "$BUMP_TYPE" != "$LABEL_BUMP_TYPE" ]; then
-            echo "::error::Changeset bump type ($BUMP_TYPE) does not match the PR label type ($LABEL_BUMP_TYPE)"
+            echo "❌ Changeset file has bump type ($BUMP_TYPE) which does not match the PR label type ($LABEL_BUMP_TYPE)"
             exit 1
           fi
+
+          echo "✅ Changeset file has matching bump type ($LABEL_BUMP_TYPE)"
 
       # 5. pnpm 설치
       - name: Install pnpm
