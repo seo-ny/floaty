@@ -172,20 +172,38 @@ jobs:
       # 10. (〃) 프리릴리즈 버전 PR 생성
       - name: Create PR to dev
         if: steps.check_changesets.outputs.found == 'true'
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-          base: dev
-          branch: ${{ steps.branch.outputs.branch }}
-          title: "Version packages (${{ steps.version.outputs.version }})"
-          body: |
-            ## ${{ steps.version.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          # GitHub CLI 설치
+          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
+
+          echo "=== Before PR creation ==="
+          echo "Current branch: $(git branch --show-current)"
+          echo "Changes between dev and current branch:"
+          git diff dev..${{ steps.branch.outputs.branch }} --name-status
+          git diff dev..${{ steps.branch.outputs.branch }} packages/floaty-core/package.json
+
+          # PR 생성
+          echo "=== Creating PR ==="
+          gh pr create \
+            --base dev \
+            --head ${{ steps.branch.outputs.branch }} \
+            --title "chore: prerelease 버전 업데이트 (${{ steps.version.outputs.version }})" \
+            --body "# ${{ steps.version.outputs.version }}
 
             ## 변경사항
             - 버전 업데이트: ${{ steps.version.outputs.version }}
             - CHANGELOG 업데이트
-            - changeset 파일 정리
-          commit-message: "chore: prerelease 버전 업데이트 (${{ steps.version.outputs.version }})"
+            - changeset 파일 정리"
+
+          echo "=== After PR creation ==="
+          gh pr list --head ${{ steps.branch.outputs.branch }} --json number,title,state
 
       # 11. (.changeset/.md 파일이 존재하지 않으면) npm 레지스트리 배포
       - name: Publish if no .changeset/*.md
