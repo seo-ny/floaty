@@ -25,7 +25,7 @@ jobs:
       - name: Check if release PR
         id: check-release-pr
         run: |
-          if [[ "${{ github.event.pull_request.title }}" == "Version Packages"* ]]; then
+          if [[ "${{ github.event.pull_request.title }}" == "Prerelease 버전 업데이트"* ]]; then
             echo "is_release_pr=true" >> $GITHUB_OUTPUT
           else
             echo "is_release_pr=false" >> $GITHUB_OUTPUT
