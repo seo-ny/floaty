@@ -196,6 +196,8 @@ jobs:
       # 11. (현재 PR이 릴리즈 PR이면) npm 레지스트리 배포
       - name: Publish if not release PR
         if: steps.check-release-pr.outputs.is_release_pr == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           OUTPUT=$(pnpm ci:publish:next)
           echo "$OUTPUT" | tee publish-output.txt
