@@ -5,5 +5,7 @@
     "@seo-ny/floaty-core": "0.1.3-next.0",
     "vanilla": "0.1.0"
   },
-  "changesets": []
+  "changesets": [
+    "tangy-gifts-shave"
+  ]
 }

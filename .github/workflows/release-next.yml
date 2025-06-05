@@ -206,7 +206,7 @@ jobs:
           gh pr create \
             --base dev \
             --head ${{ steps.branch.outputs.branch }} \
-            --title "chore: prerelease 버전 업데이트 (${{ steps.version.outputs.version }})" \
+            --title "Prerelease 버전 업데이트 (${{ steps.version.outputs.version }})" \
             --body "# ${{ steps.version.outputs.version }}
 
             ## 변경사항

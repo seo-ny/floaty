@@ -24,8 +24,14 @@ jobs:
       # 2. 릴리즈 PR 여부 확인
       - name: Check if release PR
         id: check-release-pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
-          if [[ "${{ github.event.pull_request.title }}" == "Version Packages"* ]]; then
+          # 현재 PR 제목 가져오기
+          PR_TITLE=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq .title)
+          echo "Current PR title: $PR_TITLE"
+
+          if [[ "$PR_TITLE" == "Prerelease 버전 업데이트"* ]]; then
             echo "is_release_pr=true" >> $GITHUB_OUTPUT
           else
             echo "is_release_pr=false" >> $GITHUB_OUTPUT
