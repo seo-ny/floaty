@@ -119,12 +119,28 @@ jobs:
             pnpm ci:pre:enter
           fi
 
+      # 7-1. 디버깅 정보 출력
+      - name: Debug environment
+        if: steps.check_changesets.outputs.found == 'true'
+        run: |
+          echo "Current version: $(node -p "require('./packages/floaty-core/package.json').version")"
+          echo "Changeset files:"
+          ls -la .changeset/
+          echo "pre.json content:"
+          cat .changeset/pre.json
+          echo "Changeset content:"
+          cat .changeset/*.md
+
       # 8. (〃) 버전 업데이트
       - name: Run changeset version
         if: steps.check_changesets.outputs.found == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-        run: pnpm ci:version:next
+        run: |
+          pnpm ci:version:next
+          echo "Version after changeset: $(node -p "require('./packages/floaty-core/package.json').version")"
+          git status
+          git diff
 
       # 8-1. (〃) 버전 출력
       - name: Get updated version from package.json
