@@ -1,5 +1,11 @@
 # @seo-ny/floaty-core
 
+## 0.1.3-next.1
+
+### Patch Changes
+
+- [#39](https://github.com/seo-ny/floaty/pull/39) [`53affd4`](https://github.com/seo-ny/floaty/commit/53affd4bf82c4ea12b5ada7d43ae3a05af1bc541) Thanks [@seo-ny](https://github.com/seo-ny)! - patch version update
+
 ## 0.1.3-next.0
 
 ### Patch Changes
