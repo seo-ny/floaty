@@ -108,8 +108,20 @@ jobs:
         run: |
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
           BRANCH_NAME=prerelease/next-$TIMESTAMP
+
+          # dev 브랜치를 최신 상태로 가져오기
+          git fetch origin dev
+          git checkout dev
+          git pull origin dev
+
+          # 새로운 브랜치 생성
           git checkout -b $BRANCH_NAME
           echo "branch=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+          # 브랜치 상태 확인
+          echo "=== Branch creation ==="
+          git status
+          git log -1
 
       # 7. 프리릴리즈 모드 진입
       - name: Ensure pre.json exists
@@ -124,11 +136,11 @@ jobs:
         if: steps.check_changesets.outputs.found == 'true'
         run: |
           echo "Current version: $(node -p "require('./packages/floaty-core/package.json').version")"
-          echo "==Changeset files:=="
+          echo "=== Changeset files: ==="
           ls -la .changeset/
-          echo "==pre.json content:=="
+          echo "===pre.json content: ==="
           cat .changeset/pre.json
-          echo "==Changeset content:=="
+          echo "===Changeset content: ==="
           cat .changeset/*.md
 
       # 8. (〃) 버전 업데이트
@@ -139,9 +151,9 @@ jobs:
         run: |
           pnpm ci:version:next
           echo "Version after changeset: $(node -p "require('./packages/floaty-core/package.json').version")" 
-          echo "==Git status:=="
+          echo "=== Git status: ==="
           git status
-          echo "==Git diff:=="
+          echo "=== Git diff: ==="
           git diff
 
       # 8-1. (〃) 버전 출력
@@ -166,8 +178,8 @@ jobs:
 
           # 변경사항 확인
           echo "=== Checking changes ==="
-          git diff dev..${{ steps.branch.outputs.branch }} --name-status
-          git diff dev..${{ steps.branch.outputs.branch }} packages/floaty-core/package.json
+          git diff origin/dev..origin/${{ steps.branch.outputs.branch }} --name-status
+          git diff origin/dev..origin/${{ steps.branch.outputs.branch }} packages/floaty-core/package.json
 
       # 10. (〃) 프리릴리즈 버전 PR 생성
       - name: Create PR to dev
@@ -185,9 +197,9 @@ jobs:
 
           echo "=== Before PR creation ==="
           echo "Current branch: $(git branch --show-current)"
-          echo "Changes between dev and current branch:"
-          git diff dev..${{ steps.branch.outputs.branch }} --name-status
-          git diff dev..${{ steps.branch.outputs.branch }} packages/floaty-core/package.json
+          echo "Changes between remote dev and current branch:"
+          git diff origin/dev..origin/${{ steps.branch.outputs.branch }} --name-status
+          git diff origin/dev..origin/${{ steps.branch.outputs.branch }} packages/floaty-core/package.json
 
           # PR 생성
           echo "=== Creating PR ==="
