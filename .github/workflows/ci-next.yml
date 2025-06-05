@@ -46,7 +46,7 @@ jobs:
           LABELS=$(echo '${{ toJSON(github.event.pull_request.labels.*.name) }}' | jq -r '.[]')
 
           # 유효한 라벨 목록
-          VALID_LABELS=("release:next:patch" "release:next:minor" "release:next:major" "no-release")
+          VALID_LABELS=("release:next:patch" "release:next:minor" "release:next:major")
 
           # 유효한 라벨 필터링
           MATCHED_LABELS=()
@@ -70,7 +70,7 @@ jobs:
 
       # 4. changeset 파일과 PR 라벨의 bump type 비교
       - name: Check changeset files
-        if: ${{ steps.check-release-pr.outputs.is_release_pr == 'false' && steps.check-pr-labels.outputs.RELEASE_LABEL != 'no-release' }}
+        if: ${{ steps.check-release-pr.outputs.is_release_pr == 'false' }}
         run: |
           # changeset 파일 확인
           if ! ls .changeset/*.md 1> /dev/null 2>&1; then
