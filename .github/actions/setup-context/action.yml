@@ -1,6 +1,11 @@
 name: "Setup context for workflow"
 description: "Setup environment and check if release PR"
 
+inputs:
+  personal_github_token:
+    required: true
+    description: Personal GitHub token
+
 outputs:
   is_release_pr:
     description: "Whether this is a release PR"
@@ -43,13 +48,15 @@ runs:
 
     # 3. 의존성 설치
     - name: Install dependencies
+      shell: bash
       run: pnpm install --frozen-lockfile
 
     # 4. 현재 PR이 릴리즈 PR인지 아닌지 확인
     - name: Check if release PR
       id: check-release-pr
+      shell: bash
       env:
-        GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.personal_github_token }}
       run: |
         PR_TITLE=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq .title)
         if [[ "$PR_TITLE" == "Prerelease 버전 업데이트"* ]]; then
