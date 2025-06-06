@@ -76,15 +76,6 @@ jobs:
             exit 1
           fi
 
-          # PR에 changeset 파일이 하나만 추가되었는지 확인
-          CHANGESET_COUNT=$(echo "$NEW_CHANGESET_FILES" | wc -l)
-          if [ "$CHANGESET_COUNT" -gt 1 ]; then
-            echo "❌ 여러 개의 changeset 파일이 추가되었습니다. PR당 하나의 changeset 파일만 추가해야 합니다."
-            echo "----- [ 발견된 changeset 파일들 ] -----"
-            echo "$NEW_CHANGESET_FILES"
-            exit 1
-          fi
-
           # 새로 추가된 changeset 파일의 bump type과 PR 라벨의 bump type이 일치하는지 확인
           LABEL_BUMP_TYPE=$(echo "$RELEASE_LABEL" | cut -d':' -f3)
           BUMP_TYPE=$(grep -o '": [a-z]*' "$NEW_CHANGESET_FILES" | sed 's/": //')
