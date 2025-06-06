@@ -9,20 +9,14 @@ outputs:
 runs:
   using: "composite"
   steps:
-    # 1. 레포지토리 체크아웃
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    # 2. pnpm 설치
+    # 1. pnpm 설치
     - name: Install pnpm
       uses: pnpm/action-setup@v2
       with:
         version: 9
         run_install: false
 
-    # 3. Node.js 설정
+    # 2. Node.js 설정
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -31,14 +25,14 @@ runs:
         registry-url: "https://registry.npmjs.org"
         scope: "@seo-ny"
 
-    # 3-1. pnpm 캐시 경로 출력
+    # 2-1. pnpm 캐시 경로 출력
     - name: Get pnpm store directory
       id: pnpm-cache
       shell: bash
       run: |
         echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-    # 3-2. pnpm 캐시 설정
+    # 2-2. pnpm 캐시 설정
     - name: Setup pnpm cache
       uses: actions/cache@v3
       with:
@@ -47,11 +41,11 @@ runs:
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
-    # 4. 의존성 설치
+    # 3. 의존성 설치
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
 
-    # 5. 현재 PR이 릴리즈 PR인지 아닌지 확인
+    # 4. 현재 PR이 릴리즈 PR인지 아닌지 확인
     - name: Check if release PR
       id: check-release-pr
       env:

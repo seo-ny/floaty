@@ -14,10 +14,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. 레포지토리 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. 워크플로우 컨텍스트 설정
       - uses: ./.github/actions/setup-context
         id: setup-context
 
-      # 6. PR 라벨 유효성 검사
+      # 3. PR 라벨 유효성 검사
       - name: Validate PR label
         id: check-pr-labels
         if: steps.setup-context.outputs.is_release_pr == 'false'
@@ -44,7 +51,7 @@ jobs:
 
           echo "RELEASE_LABEL=${MATCHED_LABELS[0]}" >> $GITHUB_ENV
 
-      # 7. changeset 파일 검증 및 bump type 일치 여부 확인
+      # 4. changeset 파일 검증 및 bump type 일치 여부 확인
       - name: Check changeset and validate bump type
         if: steps.setup-context.outputs.is_release_pr == 'false'
         run: |
@@ -75,18 +82,18 @@ jobs:
 
           echo "✅ changeset 파일의 bump type이 PR 라벨의 bump type과 일치합니다. ($LABEL_BUMP_TYPE)"
 
-      # 8. Lint 검사
+      # 5. Lint 검사
       - name: Run ESLint
         run: pnpm lint
 
-      # 9. Format 검사
+      # 6. Format 검사
       - name: Check formatting
         run: pnpm format:check
 
-      # 10. 테스트 실행
+      # 7. 테스트 실행
       - name: Run tests
         run: pnpm test
 
-      # 11. 라이브러리 빌드 테스트
+      # 8. 라이브러리 빌드 테스트
       - name: Build floaty-core
         run: time pnpm floaty:build:once
