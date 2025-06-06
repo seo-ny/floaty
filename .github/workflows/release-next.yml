@@ -1,4 +1,4 @@
-name: Release (release:next - Dev Merge)
+name: Release (Prerelease - Dev Merge)
 
 permissions:
   contents: write
@@ -13,136 +13,58 @@ on:
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
     outputs:
       published: ${{ steps.publish.outputs.published }}
 
     steps:
-      # 1. 레포지토리 체크아웃
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      # 2. pnpm 설치
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 9
-          run_install: false
-
-      # 3. Node.js 설정
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "pnpm"
-          registry-url: "https://registry.npmjs.org"
-          scope: "@seo-ny"
-
-      # 3-1. pnpm 캐시 경로 출력
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      # 3-2. pnpm 캐시 설정
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      # 4. 의존성 설치
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      # 5. 릴리즈 PR 여부 확인
-      - name: Check if release PR
-        id: check-release-pr
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-        run: |
-          # 현재 PR 제목 가져오기
-          PR_TITLE=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq .title)
-          echo "Current PR title: $PR_TITLE"
-
-          if [[ "$PR_TITLE" == "Prerelease 버전 업데이트"* ]]; then
-            echo "is_release_pr=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_release_pr=false" >> $GITHUB_OUTPUT
-          fi
+      - uses: ./.github/actions/setup-context
+        id: setup-context
 
       # 6. (현재 PR이 릴리즈 PR이 아니면) 새로운 브랜치 생성
       - name: Create prerelease branch if not release PR
-        if: steps.check-release-pr.outputs.is_release_pr == 'false'
+        if: steps.setup-context.outputs.is_release_pr == 'false'
         id: branch
         run: |
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          BRANCH_NAME=prerelease/next-$TIMESTAMP
+          NEW_BRANCH_NAME=prerelease/next-$TIMESTAMP
+          git checkout -b $NEW_BRANCH_NAME
+          echo "branch=$NEW_BRANCH_NAME" >> $GITHUB_OUTPUT
 
-          # dev 브랜치를 최신 상태로 가져오기
-          git fetch origin dev
-          git checkout dev
-          git pull origin dev
-
-          # 새로운 브랜치 생성
-          git checkout -b $BRANCH_NAME
-          echo "branch=$BRANCH_NAME" >> $GITHUB_OUTPUT
-
-          # 브랜치 상태 확인
-          echo "=== Branch creation ==="
-          git status
-          git log -1
-
-      # 7. 프리릴리즈 모드 진입
-      - name: Ensure pre.json exists
-        if: steps.check-release-pr.outputs.is_release_pr == 'false'
+      # 7. (〃) pre-release 설정
+      - name: Setup pre-release
+        if: steps.setup-context.outputs.is_release_pr == 'false'
         run: |
           if [ ! -f .changeset/pre.json ]; then
-            pnpm ci:pre:enter
+            echo "----- [ 프리릴리즈 모드 설정 ] -----"
+            pnpm changeset pre enter next
           fi
 
-      # 7-1. 디버깅 정보 출력
-      - name: Debug environment
-        if: steps.check-release-pr.outputs.is_release_pr == 'false'
-        run: |
-          echo "Current version: $(node -p "require('./packages/floaty-core/package.json').version")"
-          echo "=== Changeset files: ==="
-          ls -la .changeset/
-          echo "===pre.json content: ==="
-          cat .changeset/pre.json
-          echo "===Changeset content: ==="
-          cat .changeset/*.md
-
-      # 8. (〃) 버전 업데이트
-      - name: Run changeset version
-        if: steps.check-release-pr.outputs.is_release_pr == 'false'
+      # 8. (〃) 버전 업데이트 및 출력
+      - name: Run changeset version and get updated version
+        if: steps.setup-context.outputs.is_release_pr == 'false'
+        id: version
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
+          echo "----- [ 프리릴리즈 버전 업데이트 ] -----"
           pnpm ci:version:next
-          echo "Version after changeset: $(node -p "require('./packages/floaty-core/package.json').version")" 
-          echo "=== Git status: ==="
-          git status
-          echo "=== Git diff: ==="
-          git diff
-
-      # 8-1. (〃) 버전 출력
-      - name: Get updated version from package.json
-        if: steps.check-release-pr.outputs.is_release_pr == 'false'
-        id: version
-        run: |
           VERSION=$(node -p "require('./packages/floaty-core/package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+          echo
+          echo "----- [ 바뀐 버전 확인 ] -----"
+          echo "$VERSION"
+          echo "----- [ .changeset 디렉터리 내용 ] -----"
+          ls -la .changeset/
+          echo "----- [ pre.json 파일 내용 ] -----"
+          cat .changeset/pre.json
+          echo
+
       # 9. (〃) 새로운 브랜치 푸시
       - name: Push prerelease branch
-        if: steps.check-release-pr.outputs.is_release_pr == 'false'
+        if: steps.setup-context.outputs.is_release_pr == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
@@ -152,14 +74,9 @@ jobs:
           git commit -m "chore: prerelease 버전 업데이트"
           git push origin ${{ steps.branch.outputs.branch }}
 
-          # 변경사항 확인
-          echo "=== Checking changes ==="
-          git diff origin/dev..origin/${{ steps.branch.outputs.branch }} --name-status
-          git diff origin/dev..origin/${{ steps.branch.outputs.branch }} packages/floaty-core/package.json
-
       # 10. (〃) 프리릴리즈 버전 PR 생성
       - name: Create PR to dev
-        if: steps.check-release-pr.outputs.is_release_pr == 'false'
+        if: steps.setup-context.outputs.is_release_pr == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
@@ -171,40 +88,44 @@ jobs:
           && sudo apt update \
           && sudo apt install gh -y
 
-          echo "=== Before PR creation ==="
-          echo "Current branch: $(git branch --show-current)"
-          echo "Changes between remote dev and current branch:"
+          echo
+          echo "----- [ PR 생성 전 확인 ] -----"
+          echo "----- [ 현재 브랜치 ] -----"
+          echo "$(git branch --show-current)"
+          echo "----- [ 현재 브랜치의 변경사항 확인 (원격 dev 브랜치와 비교) ] -----"
           git diff origin/dev..origin/${{ steps.branch.outputs.branch }} --name-status
-          git diff origin/dev..origin/${{ steps.branch.outputs.branch }} packages/floaty-core/package.json
+          echo
 
-          # PR 생성
-          echo "=== Creating PR ==="
+          echo "----- [ PR 생성 ] -----"
           gh pr create \
             --base dev \
             --head ${{ steps.branch.outputs.branch }} \
             --title "Prerelease 버전 업데이트 (${{ steps.version.outputs.version }})" \
             --body "# ${{ steps.version.outputs.version }}
 
-            ## 변경사항
-            - 버전 업데이트: ${{ steps.version.outputs.version }}
-            - CHANGELOG 업데이트
-            - changeset 파일 정리"
+              ## 변경사항
 
-          echo "=== After PR creation ==="
+              - 버전 업데이트: ${{ steps.version.outputs.version }}
+              - CHANGELOG 업데이트
+              - changeset 파일 정리"
+
+          echo
+          echo "----- [ PR 생성 후 확인 ] -----"
           gh pr list --head ${{ steps.branch.outputs.branch }} --json number,title,state
 
       # 11. (현재 PR이 릴리즈 PR이면) npm 배포 및 배포 여부 확인
       - name: Publish if release PR
-        if: steps.check-release-pr.outputs.is_release_pr == 'true'
+        if: steps.setup-context.outputs.is_release_pr == 'true'
         id: publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           if pnpm ci:publish:next; then
             echo "published=true" >> $GITHUB_OUTPUT
+            echo "✅ npm 배포 성공"
           else
             echo "published=false" >> $GITHUB_OUTPUT
-            echo "❌ Failed to publish packages"
+            echo "❌ npm 배포 실패"
             exit 1
           fi
 
@@ -226,7 +147,7 @@ jobs:
         with:
           node-version: "20"
 
-      # 3. CHANGELOG 추출
+      # 3. CHANGELOG에서 릴리즈 노트 추출
       - name: Read CHANGELOG for Release Notes
         id: changelog
         run: |
@@ -236,7 +157,6 @@ jobs:
             capture && /^## [0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+\.[0-9]+)?/ {exit}
             capture {print}
           ' packages/floaty-core/CHANGELOG.md)
-          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
           echo 'NOTES<<EOF' >> $GITHUB_OUTPUT
           echo "$NOTES" >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
@@ -245,14 +165,15 @@ jobs:
       - name: Create GitHub Release
         uses: actions/github-script@v7
         env:
-          RELEASE_TAG: v${{ steps.changelog.outputs.VERSION }}
+          RELEASE_VERSION: ${{ steps.changelog.outputs.VERSION }}
           RELEASE_NOTES: ${{ steps.changelog.outputs.NOTES }}
         with:
           github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           script: |
             const { owner, repo } = context.repo;
-            const tag = process.env.RELEASE_TAG;
-            const name = `floaty-core ${tag}`;
+            const version = process.env.RELEASE_VERSION;
+            const tag = `v${version}`;
+            const name = `@seo-ny/floaty-core@${version}`;
             const body = process.env.RELEASE_NOTES;
             github.rest.repos.createRelease({
               owner,
