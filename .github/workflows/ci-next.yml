@@ -3,10 +3,9 @@ name: CI (release:next - Dev Merge)
 on:
   pull_request:
     types:
-      - opened
+      - labeled
       - synchronize
       - reopened
-      - labeled
     branches:
       - dev
 
