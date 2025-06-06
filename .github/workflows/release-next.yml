@@ -78,7 +78,7 @@ jobs:
           fi
 
       # 6. (현재 PR이 릴리즈 PR이 아니면) 새로운 브랜치 생성
-      - name: Create prerelease branch
+      - name: Create prerelease branch if not release PR
         if: steps.check-release-pr.outputs.is_release_pr == 'false'
         id: branch
         run: |
@@ -194,7 +194,7 @@ jobs:
           gh pr list --head ${{ steps.branch.outputs.branch }} --json number,title,state
 
       # 11. (현재 PR이 릴리즈 PR이면) npm 배포 및 배포 여부 확인
-      - name: Publish if not release PR
+      - name: Publish if release PR
         if: steps.check-release-pr.outputs.is_release_pr == 'true'
         id: publish
         env:
