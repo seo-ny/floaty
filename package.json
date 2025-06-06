@@ -25,7 +25,8 @@
     "ci:version": "ci:pre:exit && pnpm changeset version",
     "ci:publish:next": "pnpm changeset publish",
     "ci:publish": "ci:pre:exit && pnpm changeset publish",
-    "prepare": "husky"
+    "prepare": "husky",
+    "prepare-readme": "cp docs/cicd.md README.md"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.1",
