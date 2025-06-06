@@ -1,4 +1,4 @@
-name: Release (Prerelease - Dev Merge)
+name: Release (next - Dev Merge)
 
 permissions:
   contents: write
@@ -13,8 +13,8 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
     outputs:
       published: ${{ steps.publish.outputs.published }}
 
@@ -27,13 +27,24 @@ jobs:
 
       # 2. 워크플로우 컨텍스트 설정
       - uses: ./.github/actions/setup-context
-        id: setup-context
-        with:
-          personal_github_token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
 
-      # 3. (현재 PR이 릴리즈 PR이 아니면) 새로운 브랜치 생성
+      # 3. 현재 PR이 릴리즈 PR인지 아닌지 확인
+      - name: Check if release PR
+        id: check-release-pr
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          PR_TITLE=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq .title)
+          if [[ "$PR_TITLE" == "Prerelease 버전 업데이트"* ]]; then
+            echo "is_release_pr=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_release_pr=false" >> $GITHUB_OUTPUT
+          fi
+
+      # 4. (현재 PR이 릴리즈 PR이 아니면) 새로운 브랜치 생성
       - name: Create prerelease branch if not release PR
-        if: steps.setup-context.outputs.is_release_pr == 'false'
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
         id: branch
         run: |
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
@@ -41,18 +52,18 @@ jobs:
           git checkout -b $NEW_BRANCH_NAME
           echo "branch=$NEW_BRANCH_NAME" >> $GITHUB_OUTPUT
 
-      # 4. (〃) pre-release 설정
+      # 5. (〃) pre-release 설정
       - name: Setup pre-release
-        if: steps.setup-context.outputs.is_release_pr == 'false'
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
         run: |
           if [ ! -f .changeset/pre.json ]; then
             echo "----- [ 프리릴리즈 모드 설정 ] -----"
             pnpm changeset pre enter next
           fi
 
-      # 5. (〃) 버전 업데이트 및 출력
+      # 6. (〃) 버전 업데이트 및 출력
       - name: Run changeset version and get updated version
-        if: steps.setup-context.outputs.is_release_pr == 'false'
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
         id: version
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
@@ -71,9 +82,9 @@ jobs:
           cat .changeset/pre.json
           echo
 
-      # 6. (〃) 새로운 브랜치 푸시
+      # 7. (〃) 새로운 브랜치 푸시
       - name: Push prerelease branch
-        if: steps.setup-context.outputs.is_release_pr == 'false'
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
@@ -83,9 +94,9 @@ jobs:
           git commit -m "chore: prerelease 버전 업데이트"
           git push origin ${{ steps.branch.outputs.branch }}
 
-      # 7. (〃) 프리릴리즈 버전 PR 생성
-      - name: Create PR to dev
-        if: steps.setup-context.outputs.is_release_pr == 'false'
+      # 8. (〃) 프리릴리즈 버전 PR 생성
+      - name: Create prerelease PR to dev
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
@@ -99,9 +110,9 @@ jobs:
 
           echo
           echo "----- [ PR 생성 전 확인 ] -----"
-          echo "----- [ 현재 브랜치 ] -----"
+          echo "----- 현재 브랜치 -----"
           echo "$(git branch --show-current)"
-          echo "----- [ 현재 브랜치의 변경사항 확인 (원격 dev 브랜치와 비교) ] -----"
+          echo "----- 현재 브랜치의 변경사항 확인 (원격 dev 브랜치와 비교) -----"
           git diff origin/dev..origin/${{ steps.branch.outputs.branch }} --name-status
           echo
 
@@ -112,19 +123,19 @@ jobs:
             --title "Prerelease 버전 업데이트 (${{ steps.version.outputs.version }})" \
             --body "# ${{ steps.version.outputs.version }}
 
-              ## 변경사항
+            ## 변경사항
 
-              - 버전 업데이트: ${{ steps.version.outputs.version }}
-              - CHANGELOG 업데이트
-              - changeset 파일 정리"
+            - 버전 업데이트: ${{ steps.version.outputs.version }}
+            - CHANGELOG 업데이트
+            - changeset 파일 정리"
 
           echo
           echo "----- [ PR 생성 후 확인 ] -----"
           gh pr list --head ${{ steps.branch.outputs.branch }} --json number,title,state
 
-      # 8. (현재 PR이 릴리즈 PR이면) npm 배포 및 배포 여부 확인
+      # 9. (현재 PR이 릴리즈 PR이면) npm 배포 및 배포 여부 확인
       - name: Publish if release PR
-        if: steps.setup-context.outputs.is_release_pr == 'true'
+        if: steps.check-release-pr.outputs.is_release_pr == 'true'
         id: publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

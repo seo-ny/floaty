@@ -9,7 +9,7 @@
 - 전체적인 배포 흐름을 다음과 같음
 
   ```bash
-  (.changeset/*.md 파일 존재함) - 기능 PR 생성(기능 브랜치) -
+  (새로운 .changeset/*.md 파일 생성) - 기능 PR 생성(기능 브랜치) -
   
   CI 통과 - 기능 PR 머지(dev 브랜치) -
 
@@ -125,9 +125,7 @@ post-release:
 
   - `release:next:major`
 
-- `.changeset/*.md` 파일이 존재하는지 확인 (`pnpm changeset`을 실행했는가)
-
-- PR 본문에는 `## ${VERSION}`(ex. ## 0.0.0-next.0) 이 포함되어서는 안됨
+- 새로운 `.changeset/*.md` 파일이 존재하는지 확인 (`pnpm ci:changeset:next`를 실행했는가)
 
 - 코드 최신 상태인지 점검 (로컬 최신 커밋 === 원격 최신 커밋)
 
