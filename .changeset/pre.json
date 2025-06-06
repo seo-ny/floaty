@@ -6,6 +6,7 @@
     "vanilla": "0.1.0"
   },
   "changesets": [
+    "icy-coats-study",
     "new-jeans-press",
     "sad-showers-play",
     "twelve-dingos-pump"

@@ -3,6 +3,7 @@ name: CI (Prerelease - Dev Merge)
 on:
   pull_request:
     types:
+      - opened
       - labeled
       - synchronize
       - reopened
