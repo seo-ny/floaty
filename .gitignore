@@ -9,6 +9,7 @@ build/
 # Env files
 .env
 .env.*
+.envrc
 
 # npm token
 .npmrc
