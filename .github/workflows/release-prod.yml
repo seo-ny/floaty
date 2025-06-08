@@ -13,7 +13,7 @@ on:
 
 jobs:
   release:
-    name: release (latest - Main Merge)
+    name: release
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     outputs:
@@ -140,7 +140,7 @@ jobs:
           fi
 
   post-release:
-    name: post-release (latest - Main Merge)
+    name: post-release
     needs: release
     if: needs.release.outputs.published == 'true'
     runs-on: ubuntu-latest
