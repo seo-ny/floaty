@@ -1,5 +1,15 @@
 # @seo-ny/floaty-core
 
+## 0.1.4
+
+### Patch Changes
+
+- [#54](https://github.com/seo-ny/floaty/pull/54) [`0c69535`](https://github.com/seo-ny/floaty/commit/0c69535f9be8a0843d0e6b9a977bd989a64cb82c) Thanks [@seo-ny](https://github.com/seo-ny)! - patch version update
+
+- [#51](https://github.com/seo-ny/floaty/pull/51) [`851feb9`](https://github.com/seo-ny/floaty/commit/851feb9d3b5f098048c4fcf20e3cc35d00412e8b) Thanks [@seo-ny](https://github.com/seo-ny)! - patch version update
+
+- [#56](https://github.com/seo-ny/floaty/pull/56) [`a52c8a2`](https://github.com/seo-ny/floaty/commit/a52c8a2b94159e40550d6d4e313c6c0367755b8f) Thanks [@seo-ny](https://github.com/seo-ny)! - patch version update
+
 ## 0.1.4-next.1
 
 ### Patch Changes
