@@ -6,6 +6,7 @@
     "vanilla": "0.1.0"
   },
   "changesets": [
+    "fluffy-numbers-listen",
     "olive-dancers-help"
   ]
 }
