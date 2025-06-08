@@ -4,9 +4,9 @@ on:
   pull_request:
     types:
       - opened
-      - labeled
       - synchronize
       - reopened
+      - labeled
       - unlabeled
     branches:
       - dev
