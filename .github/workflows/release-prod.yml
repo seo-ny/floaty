@@ -194,15 +194,19 @@ jobs:
               prerelease: false
             });
 
-      # 10. jsdocs 빌드
+      # 5. 라이브러리 빌드
+      - name: Build floaty-core
+        run: time pnpm floaty:build:once
+
+      # 6. jsdocs 빌드
       - name: Build jsdocs
         run: pnpm floaty:docs:build
 
-      # 11. storybook 빌드
+      # 7. storybook 빌드
       - name: Build storybook
         run: pnpm vanilla:sb:build
 
-      # 12. github pages에 jsdocs, storybook 배포
+      # 8. github pages에 jsdocs, storybook 배포
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
