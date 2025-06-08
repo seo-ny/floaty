@@ -68,7 +68,7 @@ jobs:
       - name: Check changeset and validate bump type
         if: steps.check-release-pr.outputs.is_release_pr == 'false'
         run: |
-          NEW_CHANGESET_FILES=$(git diff --name-only origin/main...HEAD .changeset/ | grep '\.md$')
+          NEW_CHANGESET_FILES=$(git log --diff-filter=A --name-only --pretty="" origin/main..HEAD -- .changeset/*.md)
 
           # PR에 새롭게 추가된 changeset 파일이 있는지 확인
           if [ -z "$NEW_CHANGESET_FILES" ]; then
@@ -76,15 +76,33 @@ jobs:
             exit 1
           fi
 
+          echo "----- [ 새롭게 dev 브랜치에 직접 추가된 .changeset/*.md 파일들 ] -----"
+          echo "$NEW_CHANGESET_FILES"
+
+          # 새롭게 추가된 ./changeset/*.md 파일들 중 가장 높은 bump type 추출
+          echo "----- [ 가장 높은 bump type 추출 시작 ] -----"
+
+          HIGHEST_BUMP_TYPE="patch"
+          for file in $NEW_CHANGESET_FILES; do
+            TYPE=$(sed -nE '2s/.*: (patch|minor|major)/\1/p' "$file")
+            echo "----- $file에는 $TYPE 타입이 있습니다. -----"
+
+            if [ "$TYPE" = "major" ]; then
+              HIGHEST_BUMP_TYPE="major"
+              break
+            elif [ "$TYPE" = "minor" ] && [ "$HIGHEST_BUMP_TYPE" = "patch" ]; then
+              HIGHEST_BUMP_TYPE="minor"
+            fi
+          done
+
           # 새로 추가된 changeset 파일의 bump type과 PR 라벨의 bump type이 일치하는지 확인
           LABEL_BUMP_TYPE=$(echo "$RELEASE_LABEL" | cut -d':' -f3)
-          BUMP_TYPE=$(grep -o '": [a-z]*' "$NEW_CHANGESET_FILES" | sed 's/": //')
-          if [ "$BUMP_TYPE" != "$LABEL_BUMP_TYPE" ]; then
-            echo "❌ 새로 추가된 changeset 파일의 bump type($BUMP_TYPE)이 PR 라벨의 bump type($LABEL_BUMP_TYPE)과 일치하지 않습니다."
+          if [ "$HIGHEST_BUMP_TYPE" != "$LABEL_BUMP_TYPE" ]; then
+            echo "❌ changeset 파일의 가장 높은 bump type($HIGHEST_BUMP_TYPE)이 PR 라벨의 bump type($LABEL_BUMP_TYPE)과 일치하지 않습니다."
             exit 1
           fi
 
-          echo "✅ changeset 파일의 bump type이 PR 라벨의 bump type과 일치합니다. ($LABEL_BUMP_TYPE)"
+          echo "✅ changeset 파일의 가장 높은 bump type이 PR 라벨의 bump type과 일치합니다. ($LABEL_BUMP_TYPE)"
 
       # 6. Lint 검사
       - name: Run ESLint
