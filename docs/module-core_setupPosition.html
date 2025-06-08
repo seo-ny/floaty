@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Module: core/setupPosition | Module: core/setupPosition</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+    
+</head>
+<body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="">
+        
+            <img src="img/toast-ui.png" width="100%" height="100%">
+        
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">Module: core/setupPosition</a></h1>
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+    <div class="lnb-api hidden"><h3>Modules</h3><ul><li><a href="module-core_computePosition.html">core/computePosition</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:core/computePosition_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-core_computePosition.html#.computePosition">computePosition</a></li></ul><div class="member-type">Typedef</div><ul class="inner"><li><a href="module-core_computePosition.html#~ComputePositionOptions">ComputePositionOptions</a></li></ul></div></li><li><a href="module-core_setupPosition.html">core/setupPosition</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:core/setupPosition_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-core_setupPosition.html#.setupPosition">setupPosition</a></li><li><a href="module-core_setupPosition.html#.updatePosition">updatePosition</a></li></ul><div class="member-type">Typedef</div><ul class="inner"><li><a href="module-core_setupPosition.html#~OnAfterComputePositionCallback">OnAfterComputePositionCallback</a></li><li><a href="module-core_setupPosition.html#~OnAfterComputePositionCallbackParams">OnAfterComputePositionCallbackParams</a></li><li><a href="module-core_setupPosition.html#~OriginOptions">OriginOptions</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Namespaces</h3><ul><li><a href="utils_axis.html">utils/axis</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="utils/axis_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="utils_axis.html#.getAxesFromDirection">getAxesFromDirection</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Global</h3><ul><li class="hidden"><a href="global.html#Axes">Axes</a></li><li class="hidden"><a href="global.html#BaseOptions">BaseOptions</a></li><li class="hidden"><a href="global.html#BehaviorType">BehaviorType</a></li><li class="hidden"><a href="global.html#ElementRect">ElementRect</a></li><li class="hidden"><a href="global.html#Rect">Rect</a></li><li><a href="global.html#getInitialRect">getInitialRect</a></li></ul></div>
+</nav>
+<div id="resizer"></div>
+
+<div class="main" id="main">
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>core/setupPosition</h2>
+        
+            
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description">부유 요소의 위치를 계산하고 조정합니다.</div>
+            
+
+            
+                
+
+<dt>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+                
+
+<dt>
+    
+        <h4 class="name" id=".setupPosition">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>setupPosition<span class="signature">(referenceEl, floatingEl, originOptions)</span><span class="type-signature"> &rarr; {<a href="global.html#Rect">Rect</a>}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="core_setupPosition.js.html">core/setupPosition.js</a></code>,
+                <code><a href="core_setupPosition.js.html#line39">line 39</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        스크롤, 리사이징 등 다양한 상황에서 부유 요소의 위치 계산 및 조정
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>referenceEl</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">기준 요소</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>floatingEl</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">부유 요소</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>originOptions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">OriginOptions</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">위치 조정을 위한 옵션들</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type"><a href="global.html#Rect">Rect</a></span>
+
+
+
+
+
+- 최종적으로 계산된 rect 값
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>setupPosition(referenceEl, floatingEl, {
+  placement: "bottom-start",
+  strategy: "absolute",
+  boundary: "clippingAncestors",
+  rootBoundary: "viewport",
+  padding: 10,
+  behaviors: [{ type: "offset", options: { crossAxis: 10 } }]
+});</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".updatePosition">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>updatePosition<span class="signature">(e)</span><span class="type-signature"> &rarr; {<a href="global.html#Rect">Rect</a>}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="core_setupPosition.js.html">core/setupPosition.js</a></code>,
+                <code><a href="core_setupPosition.js.html#line59">line 59</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        위치 계산 및 조정
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>e</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Event</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">event 객체</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type"><a href="global.html#Rect">Rect</a></span>
+
+
+
+
+
+- 계산된 rect 값
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            </dl>
+    
+
+    
+        <h3 class="subsection-title">Type Definitions</h3>
+
+        <dl>
+                
+
+<dt>
+    
+        <h4 class="name" id="~OnAfterComputePositionCallback">
+            
+                <span class="type-signature"></span>OnAfterComputePositionCallback<span class="signature">(data)</span><span class="type-signature"> &rarr; {any}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="core_setupPosition.js.html">core/setupPosition.js</a></code>,
+                <code><a href="core_setupPosition.js.html#line17">line 17</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        위치 계산 후 호출되는 콜백 함수
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">OnAfterComputePositionCallbackParams</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">사용자가 위치 계산 함수 외부에서 접근할 수 있는 값</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">any</span>
+
+
+
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>const onAfterComputePosition = ({ elements, position }) => {
+  requestAnimationFrame(() => {
+    Object.assign(elements.floating.style, {
+      position: strategy,
+      left: `${position.x}px`,
+      top: `${position.y}px`
+    });
+  });
+};</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+<h4 class="name" id="~OnAfterComputePositionCallbackParams">
+    OnAfterComputePositionCallbackParams
+    
+    <div class="container-source members">
+        <code><a href="core_setupPosition.js.html">core/setupPosition.js</a></code>,
+        <code><a href="core_setupPosition.js.html#line6">line 6</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        OnAfterComputePositionCallback의 파라미터
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>elements</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <h6>Properties</h6>
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>reference</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">기준 요소</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>floating</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">부유 요소</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>position</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <h6>Properties</h6>
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">x 값</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">y 값</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+            
+                
+
+<dt>
+<h4 class="name" id="~OriginOptions">
+    OriginOptions
+    
+    <div class="container-source members">
+        <code><a href="core_setupPosition.js.html">core/setupPosition.js</a></code>,
+        <code><a href="core_setupPosition.js.html#line34">line 34</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type"><a href="global.html#BaseOptions">BaseOptions</a></span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>onAfterComputePosition</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">OnAfterComputePositionCallback</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">위치 계산 후 호출되는 콜백 함수</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+            </dl>
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<footer>
+    <img class="logo" src="img/toast-ui.png" style="">
+    <div class="footer-text">NHN Entertainment. Frontend Development Lab</div>
+</footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+    <script>
+        var id = 'module:core/setupPosition_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
+    </script>
+
+</body>
+</html>
