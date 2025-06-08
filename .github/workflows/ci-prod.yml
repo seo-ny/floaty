@@ -1,0 +1,131 @@
+name: CI (latest - Main Merge)
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
+    branches:
+      - main
+
+jobs:
+  validate:
+    name: validate (latest - Main Merge)
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 레포지토리 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. 워크플로우 컨텍스트 설정
+      - uses: ./.github/actions/setup-context
+
+      # 3. 현재 PR이 릴리즈 PR인지 아닌지 확인
+      - name: Check if release PR
+        id: check-release-pr
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          PR_TITLE=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq .title)
+          if [[ "$PR_TITLE" == "Release 버전 업데이트"* ]]; then
+            echo "is_release_pr=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_release_pr=false" >> $GITHUB_OUTPUT
+          fi
+
+      # 4. (현재 PR이 릴리즈 PR이 아니면) PR 라벨 유효성 검사
+      - name: Validate PR label
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
+        run: |
+          LABELS=$(echo '${{ toJSON(github.event.pull_request.labels.*.name) }}' | jq -r '.[]')
+          VALID_LABELS=("release:prod:patch" "release:prod:minor" "release:prod:major")
+
+          # 유효한 라벨 추출
+          MATCHED_LABELS=()
+          for label in $LABELS; do
+            for valid_label in "${VALID_LABELS[@]}"; do
+              if [ "$label" = "$valid_label" ]; then
+                MATCHED_LABELS+=("$label")
+              fi
+            done
+          done
+
+          # 유효한 라벨이 하나만 존재하는지 확인
+          MATCHED_COUNT=${#MATCHED_LABELS[@]}
+          if [ "$MATCHED_COUNT" -ne 1 ]; then
+            echo "❌ 단 한 개의 유효한 라벨이 존재해야 합니다. $MATCHED_COUNT개의 유효한 라벨이 존재합니다. 이 중 하나만 포함해야 합니다: ${VALID_LABELS[*]}"
+            exit 1
+          fi
+
+          echo "RELEASE_LABEL=${MATCHED_LABELS[0]}" >> $GITHUB_ENV
+
+      # 5. (현재 PR이 릴리즈 PR이 아니면) changeset 파일 검증 및 bump type 일치 여부 확인
+      - name: Check changeset and validate bump type
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
+        run: |
+          NEW_CHANGESET_FILES=$(git log --diff-filter=A --name-only --pretty="" origin/main..HEAD -- .changeset/*.md)
+
+          # PR에 새롭게 추가된 changeset 파일이 있는지 확인
+          if [ -z "$NEW_CHANGESET_FILES" ]; then
+            echo "❌ 현재 PR에는 새롭게 추가된 .changeset/*.md 파일이 없습니다."
+            exit 1
+          fi
+
+          echo "----- [ 새롭게 dev 브랜치에 직접 추가된 .changeset/*.md 파일들 ] -----"
+          echo "$NEW_CHANGESET_FILES"
+
+          # 새롭게 추가된 ./changeset/*.md 파일들 중 가장 높은 bump type 추출
+          echo "----- [ 가장 높은 bump type 추출 시작 ] -----"
+
+          HIGHEST_BUMP_TYPE="patch"
+          for file in $NEW_CHANGESET_FILES; do
+            TYPE=$(sed -nE '2s/.*: (patch|minor|major)/\1/p' "$file")
+            echo "----- $file에는 $TYPE 타입이 있습니다. -----"
+
+            if [ "$TYPE" = "major" ]; then
+              HIGHEST_BUMP_TYPE="major"
+              break
+            elif [ "$TYPE" = "minor" ] && [ "$HIGHEST_BUMP_TYPE" = "patch" ]; then
+              HIGHEST_BUMP_TYPE="minor"
+            fi
+          done
+
+          # 새로 추가된 changeset 파일의 bump type과 PR 라벨의 bump type이 일치하는지 확인
+          LABEL_BUMP_TYPE=$(echo "$RELEASE_LABEL" | cut -d':' -f3)
+          if [ "$HIGHEST_BUMP_TYPE" != "$LABEL_BUMP_TYPE" ]; then
+            echo "❌ changeset 파일의 가장 높은 bump type($HIGHEST_BUMP_TYPE)이 PR 라벨의 bump type($LABEL_BUMP_TYPE)과 일치하지 않습니다."
+            exit 1
+          fi
+
+          echo "✅ changeset 파일의 가장 높은 bump type이 PR 라벨의 bump type과 일치합니다. ($LABEL_BUMP_TYPE)"
+
+      # 6. Lint 검사
+      - name: Run ESLint
+        run: pnpm lint
+
+      # 7. Format 검사
+      - name: Check formatting
+        run: pnpm format:check
+
+      # 8. 테스트 실행
+      - name: Run tests
+        run: pnpm test
+
+      # 9. 라이브러리 빌드 테스트
+      - name: Build floaty-core
+        run: time pnpm floaty:build:once
+
+      # 10. jsdocs 빌드 테스트
+      - name: Build jsdocs
+        run: pnpm floaty:docs:build
+
+      # 11. storybook 빌드 테스트
+      - name: Build storybook
+        run: pnpm vanilla:sb:build

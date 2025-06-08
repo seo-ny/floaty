@@ -4,9 +4,13 @@ import { getColorList } from "../../api.js";
 export default {
   title: "components/select",
   render: Template,
+  loaders: [
+    async () => ({
+      colorList: await getColorList()
+    })
+  ],
   args: {
     placement: "bottom",
-    // strategy: "absolute",
     boundary: "clippingAncestors",
     rootBoundary: "viewport",
     padding: 0,
@@ -38,11 +42,11 @@ export default {
         "right-end"
       ]
     },
-    // strategy: {
-    //   description: "floatingEl의 포지셔닝 방식",
-    //   control: "inline-radio",
-    //   options: ["absolute", "fixed"]
-    // },
+    strategy: {
+      table: {
+        disable: true
+      }
+    },
     boundary: {
       description:
         "(개발자가 설정할) floatingEl이 넘치는지 판단할 기준이 되는 경계 (여길 넘으면 안돼!)",
@@ -69,16 +73,19 @@ export default {
       description:
         "위치 계산 직후 실행될 사용자 정의 로직 (ex. 스타일 업데이트)",
       control: "object"
+    },
+    select: {
+      table: {
+        disable: true
+      }
     }
   }
 };
 
-const colorList = await getColorList();
-
 const getDefaultArgsWithStrategy = (strategy = "absolute") => {
   return {
     select: {
-      options: colorList,
+      options: [],
       placeholder: "선택하시오.",
       maxVisibleItems: 8
     },
@@ -97,9 +104,27 @@ const getDefaultArgsWithStrategy = (strategy = "absolute") => {
 };
 
 export const Absolute = {
-  args: getDefaultArgsWithStrategy("absolute")
+  args: getDefaultArgsWithStrategy("absolute"),
+  render: (args, { loaded }) => {
+    return Template({
+      ...args,
+      select: {
+        ...args.select,
+        options: loaded.colorList
+      }
+    });
+  }
 };
 
 export const Fixed = {
-  args: getDefaultArgsWithStrategy("fixed")
+  args: getDefaultArgsWithStrategy("fixed"),
+  render: (args, { loaded }) => {
+    return Template({
+      ...args,
+      select: {
+        ...args.select,
+        options: loaded.colorList
+      }
+    });
+  }
 };

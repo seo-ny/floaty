@@ -1,0 +1,211 @@
+name: Release (latest - Main Merge)
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  release:
+    name: release (latest - Main Merge)
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      published: ${{ steps.publish.outputs.published }}
+
+    steps:
+      # 1. 레포지토리 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. 워크플로우 컨텍스트 설정
+      - uses: ./.github/actions/setup-context
+
+      # 3. 현재 PR이 릴리즈 PR인지 아닌지 확인
+      - name: Check if release PR
+        id: check-release-pr
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          PR_TITLE=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq .title)
+          if [[ "$PR_TITLE" == "Release 버전 업데이트"* ]]; then
+            echo "is_release_pr=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_release_pr=false" >> $GITHUB_OUTPUT
+          fi
+
+      # 4. (현재 PR이 릴리즈 PR이 아니면) 새로운 브랜치 생성
+      - name: Create release branch if not release PR
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
+        id: branch
+        run: |
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          NEW_BRANCH_NAME=release/$TIMESTAMP
+          git checkout -b $NEW_BRANCH_NAME
+          echo "branch=$NEW_BRANCH_NAME" >> $GITHUB_OUTPUT
+
+      # 5. (〃) 버전 업데이트 및 출력
+      - name: Run changeset version and get updated version
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
+        id: version
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          echo "----- [ 정식 릴리즈 버전 업데이트 ] -----"
+          pnpm ci:version
+          VERSION=$(node -p "require('./packages/floaty-core/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          echo
+          echo "----- [ 바뀐 버전 확인 ] -----"
+          echo "$VERSION"
+          echo "----- [ .changeset 디렉터리 내용 ] -----"
+          ls -la .changeset/
+          echo
+
+      # 6. (〃) 새로운 브랜치 푸시
+      - name: Push release branch
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "chore: release 버전 업데이트"
+          git push origin ${{ steps.branch.outputs.branch }}
+
+      # 7. (〃) 정식 릴리즈 버전 PR 생성
+      - name: Create release PR to main
+        if: steps.check-release-pr.outputs.is_release_pr == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          # GitHub CLI 설치
+          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
+
+          echo
+          echo "----- [ PR 생성 전 확인 ] -----"
+          echo "----- 현재 브랜치 -----"
+          echo "$(git branch --show-current)"
+          echo "----- 현재 브랜치의 변경사항 확인 (원격 main 브랜치와 비교) -----"
+          git diff origin/main..origin/${{ steps.branch.outputs.branch }} --name-status
+          echo
+
+          echo "----- [ PR 생성 ] -----"
+          gh pr create \
+            --base main \
+            --head ${{ steps.branch.outputs.branch }} \
+            --title "Release 버전 업데이트 (${{ steps.version.outputs.version }})" \
+            --body "# ${{ steps.version.outputs.version }}
+
+            ## 변경사항
+
+            - 버전 업데이트: ${{ steps.version.outputs.version }}
+            - CHANGELOG 업데이트
+            - changeset 파일 정리"
+
+          echo
+          echo "----- [ PR 생성 후 확인 ] -----"
+          gh pr list --head ${{ steps.branch.outputs.branch }} --json number,title,state
+
+      # 8. (현재 PR이 릴리즈 PR이면) npm 배포 및 배포 여부 확인
+      - name: Publish if release PR
+        if: steps.check-release-pr.outputs.is_release_pr == 'true'
+        id: publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if pnpm ci:publish; then
+            echo "published=true" >> $GITHUB_OUTPUT
+            echo "✅ npm 배포 성공"
+          else
+            echo "published=false" >> $GITHUB_OUTPUT
+            echo "❌ npm 배포 실패"
+            exit 1
+          fi
+
+  post-release:
+    name: post-release (latest - Main Merge)
+    needs: release
+    if: needs.release.outputs.published == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 레포지토리 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. 컨텍스트 설정
+      - uses: ./.github/actions/setup-context
+
+      # 3. CHANGELOG에서 릴리즈 노트 추출
+      - name: Read CHANGELOG for Release Notes
+        id: changelog
+        run: |
+          VERSION=$(node -p "require('./packages/floaty-core/package.json').version")
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          NOTES=$(awk -v ver="## ${VERSION}" '
+            $0 ~ ver {capture=1; next}
+            capture && /^## [0-9]+\.[0-9]+\.[0-9]+/ {exit}
+            capture {print}
+          ' packages/floaty-core/CHANGELOG.md)
+          echo 'NOTES<<EOF' >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+      # 4. Github 릴리즈
+      - name: Create GitHub Release
+        uses: actions/github-script@v7
+        env:
+          RELEASE_VERSION: ${{ steps.changelog.outputs.VERSION }}
+          RELEASE_NOTES: ${{ steps.changelog.outputs.NOTES }}
+        with:
+          github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const version = process.env.RELEASE_VERSION;
+            const tag = `v${version}`;
+            const name = `@seo-ny/floaty-core@${version}`;
+            const body = process.env.RELEASE_NOTES;
+            github.rest.repos.createRelease({
+              owner,
+              repo,
+              tag_name: tag,
+              target_commitish: context.sha,
+              name,
+              body,
+              prerelease: false
+            });
+
+      # 10. jsdocs 빌드
+      - name: Build jsdocs
+        run: pnpm floaty:docs:build
+
+      # 11. storybook 빌드
+      - name: Build storybook
+        run: pnpm vanilla:sb:build
+
+      # 12. github pages에 jsdocs, storybook 배포
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          publish_dir: ./website
+          publish_branch: gh-pages

@@ -9,6 +9,7 @@ build/
 # Env files
 .env
 .env.*
+.envrc
 
 # npm token
 .npmrc
@@ -30,3 +31,10 @@ storybook-static/
 
 # Coverage
 coverage/
+
+# website
+website/docs/
+website/playground/
+
+# sandbox
+sandbox/

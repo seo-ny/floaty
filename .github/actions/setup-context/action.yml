@@ -1,0 +1,42 @@
+name: "Setup context"
+description: "Setup context for workflow"
+
+runs:
+  using: "composite"
+  steps:
+    # 1. pnpm 설치
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 9
+        run_install: false
+
+    # 2. Node.js 설정
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+        cache: "pnpm"
+        registry-url: "https://registry.npmjs.org"
+        scope: "@seo-ny"
+
+    # 2-1. pnpm 캐시 경로 출력
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+    # 2-2. pnpm 캐시 설정
+    - name: Setup pnpm cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    # 3. 의존성 설치
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
