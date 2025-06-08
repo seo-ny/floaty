@@ -181,7 +181,7 @@ jobs:
           }
           git push origin $ORIGINAL_BRANCH
 
-          echo "----- [ dev -> PR 브랜치 동기화 완료 ] -----"
+          echo "----- [ dev -> original PR 브랜치 동기화 완료 ] -----"
           echo "dev -> $ORIGINAL_BRANCH"
 
       # 3. CHANGELOG에서 릴리즈 노트 추출
