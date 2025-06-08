@@ -12,6 +12,7 @@ on:
 
 jobs:
   validate:
+    name: validate (next - Dev Merge)
     runs-on: ubuntu-latest
 
     steps:
