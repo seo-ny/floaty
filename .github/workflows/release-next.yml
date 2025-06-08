@@ -48,8 +48,9 @@ jobs:
         if: steps.check-release-pr.outputs.is_release_pr == 'false'
         id: branch
         run: |
+          ORIGINAL_BRANCH=${{ github.event.pull_request.head.ref }}
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          NEW_BRANCH_NAME=prerelease/next-$TIMESTAMP
+          NEW_BRANCH_NAME=prerelease/next-$TIMESTAMP-from-${ORIGINAL_BRANCH}
           git checkout -b $NEW_BRANCH_NAME
           echo "branch=$NEW_BRANCH_NAME" >> $GITHUB_OUTPUT
 
@@ -161,19 +162,27 @@ jobs:
         with:
           node-version: "20"
 
-      # 3. dev -> PR 브랜치 동기화
-      - name: Sync dev to main
+      # 3. dev -> original PR 브랜치 동기화
+      - name: Sync PR branch to dev
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+          CURRENT_BRANCH="$HEAD_REF"
+          ORIGINAL_BRANCH="${CURRENT_BRANCH#*-from-}"
+
           git fetch origin
-          git checkout ${{ github.head_ref }}
-          git merge origin/dev -m "dev 브랜치 변경사항을 ${{ github.head_ref }}에 동기화" || {
-            echo "❌ 충돌이 발생했습니다. 수동으로 ${{ github.head_ref }} 브랜치를 dev와 동기화하세요."
+          git checkout $ORIGINAL_BRANCH
+          git merge origin/dev -m "dev 브랜치 변경사항을 $ORIGINAL_BRANCH에 동기화" || {
+            echo "❌ 충돌이 발생했습니다. 수동으로 $ORIGINAL_BRANCH 브랜치를 dev와 동기화하세요."
             exit 1
           }
-          git push origin ${{ github.head_ref }}
+          git push origin $ORIGINAL_BRANCH
+
+          echo "----- [ dev -> PR 브랜치 동기화 완료 ] -----"
+          echo "dev -> $ORIGINAL_BRANCH"
 
       # 3. CHANGELOG에서 릴리즈 노트 추출
       - name: Read CHANGELOG for Release Notes
