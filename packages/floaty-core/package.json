@@ -1,6 +1,6 @@
 {
   "name": "@seo-ny/floaty-core",
-  "version": "0.1.3",
+  "version": "0.1.4-next.1",
   "description": "Floating logic core for positioning elements (vanilla JS)",
   "main": "./dist/floaty.umd.js",
   "module": "./dist/floaty.mjs",

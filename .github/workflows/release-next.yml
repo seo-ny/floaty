@@ -13,7 +13,7 @@ on:
 
 jobs:
   release:
-    name: release (next - Dev Merge)
+    name: release
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     outputs:
@@ -48,8 +48,9 @@ jobs:
         if: steps.check-release-pr.outputs.is_release_pr == 'false'
         id: branch
         run: |
+          ORIGINAL_BRANCH=${{ github.event.pull_request.head.ref }}
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          NEW_BRANCH_NAME=prerelease/next-$TIMESTAMP
+          NEW_BRANCH_NAME=prerelease/next-$TIMESTAMP-from-${ORIGINAL_BRANCH}
           git checkout -b $NEW_BRANCH_NAME
           echo "branch=$NEW_BRANCH_NAME" >> $GITHUB_OUTPUT
 
@@ -91,7 +92,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
+          git add -A
           git commit -m "chore: prerelease 버전 업데이트"
           git push origin ${{ steps.branch.outputs.branch }}
 
@@ -101,14 +102,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
-          # GitHub CLI 설치
-          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
-          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
-          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-          && sudo apt update \
-          && sudo apt install gh -y
-
           echo
           echo "----- [ PR 생성 전 확인 ] -----"
           echo "----- 현재 브랜치 -----"
@@ -151,7 +144,7 @@ jobs:
           fi
 
   post-release:
-    name: post-release (next - Dev Merge)
+    name: post-release
     needs: release
     if: needs.release.outputs.published == 'true'
     runs-on: ubuntu-latest
@@ -168,6 +161,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      # 3. dev -> original PR 브랜치 동기화
+      - name: Sync PR branch to dev
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          CURRENT_BRANCH="$HEAD_REF"
+          ORIGINAL_BRANCH="${CURRENT_BRANCH#*-from-}"
+
+          git fetch origin
+          git checkout $ORIGINAL_BRANCH
+          git merge origin/dev -m "dev 브랜치 변경사항을 $ORIGINAL_BRANCH에 동기화" || {
+            echo "❌ 충돌이 발생했습니다. 수동으로 $ORIGINAL_BRANCH 브랜치를 dev와 동기화하세요."
+            exit 1
+          }
+          git push origin $ORIGINAL_BRANCH
+
+          echo "----- [ dev -> original PR 브랜치 동기화 완료 ] -----"
+          echo "dev -> $ORIGINAL_BRANCH"
 
       # 3. CHANGELOG에서 릴리즈 노트 추출
       - name: Read CHANGELOG for Release Notes

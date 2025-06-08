@@ -4,16 +4,16 @@ on:
   pull_request:
     types:
       - opened
-      - labeled
       - synchronize
       - reopened
+      - labeled
       - unlabeled
     branches:
       - dev
 
 jobs:
   validate:
-    name: validate (next - Dev Merge)
+    name: validate
     runs-on: ubuntu-latest
 
     steps:
@@ -70,7 +70,7 @@ jobs:
       - name: Check changeset and validate bump type
         if: steps.check-release-pr.outputs.is_release_pr == 'false'
         run: |
-          NEW_CHANGESET_FILES=$(git diff --name-only origin/dev...HEAD .changeset/ | grep '\.md$')
+          NEW_CHANGESET_FILES=$(git log --diff-filter=A --name-only --pretty="" origin/dev..HEAD -- .changeset/*.md)
 
           # PR에 새롭게 추가된 changeset 파일이 있는지 확인
           if [ -z "$NEW_CHANGESET_FILES" ]; then
