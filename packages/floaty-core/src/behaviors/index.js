@@ -24,7 +24,7 @@ const isValidBehavior = (behavior = {}) => {
 
 const applyBehavior = ({
   currentRect = DEFAULT_RECT,
-  behavior = {},
+  behavior = { name: "offset", options: {} },
   rects = {
     reference: DEFAULT_RECT,
     floating: DEFAULT_RECT

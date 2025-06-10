@@ -15,7 +15,7 @@
  */
 
 /**
- * @typedef {"offset" | "flip" | "shift" | "size" | "hide"} BehaviorType
+ * @typedef {{name: "offset" | "flip" | "shift" | "size" | "hide", options: Object}} BehaviorType
  * @description 부유 요소의 위치를 조정하기 위해 사용할 수 있는 동작 목록
  */
 
