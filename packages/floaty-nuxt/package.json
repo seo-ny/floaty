@@ -1,0 +1,35 @@
+{
+  "name": "@seo-ny/floaty-nuxt",
+  "version": "0.1.0",
+  "description": "Floaty Nuxt Module",
+  "main": "dist/module.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "nuxt-module-build",
+    "dev": "nuxt-module-build --watch",
+    "lint": "eslint .",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "nuxt",
+    "nuxt-module",
+    "floaty",
+    "floating-ui"
+  ],
+  "author": "seo-ny",
+  "license": "MIT",
+  "dependencies": {
+    "@seo-ny/floaty-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@nuxt/module-builder": "^3.0.0",
+    "@nuxtjs/eslint-config": "^11.0.0",
+    "eslint": "^8.0.0",
+    "nuxt": "^3.0.0"
+  },
+  "peerDependencies": {
+    "nuxt": "^3.0.0"
+  }
+}
