@@ -32,6 +32,7 @@ export const offset = ({
     alignmentAxis:
       alignment === START ? alignmentAxis : END ? -alignmentAxis : 0
   };
+  // alignmentAxis 우선 적용
   const xOffset = isVertical
     ? offset.alignmentAxis || offset.crossAxis
     : offset.mainAxis;
