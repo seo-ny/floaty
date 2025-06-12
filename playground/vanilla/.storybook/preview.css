@@ -13,7 +13,7 @@ body {
   overflow: auto;
   width: 70%;
   height: 80vh;
-  background-color: lightpink;
+  /* background-color: lightpink; */
 }
 
 .wrapper {
@@ -23,7 +23,7 @@ body {
   left: 100px;
   width: 400px;
   height: 300px;
-  border: 50px solid black;
+  border: 4px solid black;
   padding: 30px;
   background-color: lightgray;
 }
@@ -31,9 +31,9 @@ body {
 .box {
   width: 400px;
   height: 1400px;
-  background-color: firebrick;
+  /* background-color: firebrick; */
 }
 
 .box.bottom {
-  background-color: slateblue;
+  /* background-color: slateblue; */
 }

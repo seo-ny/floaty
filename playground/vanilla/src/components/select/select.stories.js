@@ -17,7 +17,7 @@ export default {
     behaviors: [
       {
         name: "offset",
-        options: { mainAxis: 10, alignmentAxis: 50 }
+        options: { mainAxis: 10, alignmentAxis: 0 }
       }
     ],
     onAfterComputePosition: null
